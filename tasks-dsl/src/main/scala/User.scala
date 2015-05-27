@@ -11,6 +11,9 @@ import scala.io.StdIn
 sealed trait User {
   def username: String
   def password: PasswordFunc
+
+  lazy val localName: String = System.getProperty("user.name")
+  lazy val localPassword: PasswordFunc = () => StdIn.readLine("Please enter your passphrase:").toCharArray
 }
 
 case object NoUser extends User {
@@ -25,10 +28,6 @@ case class SshUser(username: String, keyFile: Option[File]) extends User with Ss
 
 case class SshUserWithPassword(username: String, keyFile: Option[File], pwd: String) extends User with SshCredentials {
   lazy val password: PasswordFunc = () => pwd.toCharArray
-}
-
-case class LocalUser(username: String) extends User {
-  lazy val password: PasswordFunc = () => StdIn.readLine("Please enter your passphrase:").toCharArray
 }
 
 object User {

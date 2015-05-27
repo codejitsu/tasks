@@ -15,8 +15,6 @@ class TouchTest extends FlatSpec with Matchers {
   implicit val timeout = 30 seconds
 
   "Touch task" should "create a file with given name on given host" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val file2create = new File(path + name)
@@ -36,3 +34,4 @@ class TouchTest extends FlatSpec with Matchers {
     file2create.delete
   }
 }
+

@@ -268,8 +268,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "run processes on localhost" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
     val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
 
@@ -292,8 +290,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on localhost" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
     val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
 
@@ -313,8 +309,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on monadic way" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
     val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
 
@@ -338,8 +332,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on monadic way (one task)" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
     val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
 
@@ -361,8 +353,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on monadic way (failure)" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
     val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
 
@@ -385,8 +375,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "run processes sequentially" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-param.sh").getPath
 
     val program1: Process = "test" on Localhost ~> {
@@ -418,8 +406,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "run processes parallel" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-param.sh").getPath
 
     val program1: Process = "test" on Localhost ~> {
@@ -452,8 +438,6 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "preserve the execution order" in {
-    implicit val user = LocalUser("me")
-
     val procStart = "sh " + getClass.getResource("/program-param.sh").getPath
 
     val program1: Process = "test" on Localhost ~> {

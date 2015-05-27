@@ -14,8 +14,6 @@ class RmTest extends FlatSpec with Matchers {
   implicit val timeout = 30 seconds
 
   "Rm task" should "remove a file with given name on given host" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val file2create = new File(path + name)
@@ -44,8 +42,6 @@ class RmTest extends FlatSpec with Matchers {
   }
 
   it should "compose with the touch task" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val file2create = new File(path + name)
@@ -67,8 +63,6 @@ class RmTest extends FlatSpec with Matchers {
   }
 
   it should "compose with the touch task with `andThen`" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val file2create = new File(path + name)
@@ -89,8 +83,6 @@ class RmTest extends FlatSpec with Matchers {
   }
 
   it should "return error if file don't exists" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val file2create = new File(path + name)

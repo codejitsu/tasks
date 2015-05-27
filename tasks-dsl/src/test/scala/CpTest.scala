@@ -14,8 +14,6 @@ class CpTest extends FlatSpec with Matchers {
   implicit val timeout = 30 seconds
 
   "Cp task" should "copy a file with given name on given host" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val namecopy = s"${UUID.randomUUID().toString}testfile.txt"
@@ -47,8 +45,6 @@ class CpTest extends FlatSpec with Matchers {
   }
 
   it should "compose with the touch task" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val namecopy = s"${UUID.randomUUID().toString}testfile.txt"
@@ -73,8 +69,6 @@ class CpTest extends FlatSpec with Matchers {
   }
 
   it should "compose with the touch task with `andThen`" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val namecopy = s"${UUID.randomUUID().toString}testfile.txt"
@@ -98,8 +92,6 @@ class CpTest extends FlatSpec with Matchers {
   }
 
   it should "return error if file don't exists" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val name = s"${UUID.randomUUID().toString}testfile.txt"
     val namecopy = s"${UUID.randomUUID().toString}testfile.txt"

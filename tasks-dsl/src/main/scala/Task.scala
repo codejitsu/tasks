@@ -12,7 +12,7 @@ object VerbosityLevel extends Enumeration {
   val No, Verbose, Full = Value
 }
 
-import VerbosityLevel._
+import net.codejitsu.tasks.dsl.VerbosityLevel._
 
 trait Description {
   def description: String = ""
@@ -151,50 +151,38 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     case _ =>
   }
 
-  private def executeLocal(cmd: CommandLine, verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = user match {
-    case lu @ LocalUser(_) =>
-      val out = ListBuffer[String]()
-      val err = ListBuffer[String]()
+  private def executeLocal(cmd: CommandLine, verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+    val out = ListBuffer[String]()
+    val err = ListBuffer[String]()
 
-      val msg = mkCommandLog(cmd, verbose)
+    val msg = mkCommandLog(cmd, verbose)
 
-      val result = cmd match {
-        case SudoExec(_, _*) =>
-          (s"echo '${lu.password().mkString}' | ${cmd.cmd}" run (ProcessLogger(doOut(out, verbose)(_),
-            doOut(err, verbose)(_)))).exitValue()
+    val result = cmd match {
+      case SudoExec(_, _*) =>
+        (s"echo '${user.localPassword().mkString}' | ${cmd.cmd}" run (ProcessLogger(doOut(out, verbose)(_),
+          doOut(err, verbose)(_)))).exitValue()
 
-        case Exec(_, _*) =>
-          (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
+      case Exec(_, _*) =>
+        (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
-        case NoExec => 0
-      }
+      case NoExec => 0
+    }
 
-      if (result == 0) {
-        verbose match {
-          case Verbose | Full => println(s"$msg [${Console.GREEN} ok ${Console.WHITE}]")
-          case _ =>
-        }
-
-        (Success(true), out.toList, err.toList)
-      } else {
-        verbose match {
-          case Verbose | Full => println(s"$msg [${Console.RED} failed ${Console.WHITE}]")
-          case _ =>
-        }
-
-        (Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
-      }
-
-    case _ =>
+    if (result == 0) {
       verbose match {
-        case Verbose | Full =>
-          val msg = mkCommandLog(cmd, verbose)
-          println(s"$msg [${Console.RED} failed ${Console.WHITE}]")
+        case Verbose | Full => println(s"$msg [${Console.GREEN} ok ${Console.WHITE}]")
         case _ =>
       }
 
-      (Failure(new TaskExecutionError(List("Please provide localhost credentials."))), Nil,
-        List("Please provide localhost credentials."))
+      (Success(true), out.toList, err.toList)
+    } else {
+      verbose match {
+        case Verbose | Full => println(s"$msg [${Console.RED} failed ${Console.WHITE}]")
+        case _ =>
+      }
+
+      (Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+    }
   }
 
   private def buildSshCommandFor(remoteHost: Host, cmd: CommandLine, sshu: User with SshCredentials) = {

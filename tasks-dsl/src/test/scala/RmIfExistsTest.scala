@@ -13,8 +13,6 @@ class RmIfExistsTest extends FlatSpec with Matchers {
   implicit val timeout = 30 seconds
 
   "RmIfExists task" should "remove a file with given name on given host" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val file2create = new File(path + "testfile.txt")
 
@@ -42,8 +40,6 @@ class RmIfExistsTest extends FlatSpec with Matchers {
   }
 
   it should "compose with the touch task" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val file2create = new File(path + "testfile.txt")
 
@@ -64,8 +60,6 @@ class RmIfExistsTest extends FlatSpec with Matchers {
   }
 
   it should "compose with the touch task with `andThen`" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val file2create = new File(path + "testfile.txt")
 
@@ -85,8 +79,6 @@ class RmIfExistsTest extends FlatSpec with Matchers {
   }
 
   it should "not return error if file dont exists" in {
-    implicit val user = LocalUser("me")
-
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val file2create = new File(path + "testfile.txt")
 
