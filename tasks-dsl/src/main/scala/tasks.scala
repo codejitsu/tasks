@@ -2,6 +2,7 @@
 
 package net.codejitsu.tasks.dsl
 
+import java.net.URL
 import java.util.concurrent.TimeoutException
 
 import net.codejitsu.tasks.dsl.Dsl._
@@ -13,9 +14,11 @@ import scala.util.{Failure, Success, Try}
 
 //All shell specific tasks go here
 
-abstract class GenericTask(name: String, hosts: Hosts, exec: String,
+abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: String,
                        params: List[String] = Nil, usingSudo: Boolean = false,
-                       usingPar: Boolean = false, cmd: Command = Start)(implicit user: User) extends TaskM[Boolean] {
+                       usingPar: Boolean = false, cmd: Command = Start, taskRepr: String = "")(implicit user: User) extends TaskM[Boolean] {
+  override def description: String = desc
+
   protected val procs: Processes = name on hosts ~> {
     case cmd => if (usingSudo) {
       Sudo ~ Exec(exec, params :_*)
@@ -32,6 +35,16 @@ abstract class GenericTask(name: String, hosts: Hosts, exec: String,
   } else {
     procs ! cmd
   }
+
+  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
+    LoggedRun(
+      verbose,
+      usingSudo,
+      usingPar,
+      hosts,
+      taskRepr,
+      task
+    )(verbose)
 }
 
 /**
@@ -45,22 +58,10 @@ abstract class GenericTask(name: String, hosts: Hosts, exec: String,
  */
 case class Touch(hosts: Hosts, target: String,
                  usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/usr/bin/touch")(implicit user: User)
-  extends GenericTask("touch", hosts, exec, List(target), usingSudo, usingPar) with UsingSudo[Touch] with UsingParallelExecution[Touch] {
-
-  override def description: String = "create"
-
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
-    LoggedRun(
-      verbose,
-      usingSudo,
-      usingPar,
-      hosts,
-      s"$description '${target}'",
-      task
-    )(verbose)
+  extends GenericTask("touch", "create file", hosts, exec, List(target),
+    usingSudo, usingPar, taskRepr = s"create file '$target'") with UsingSudo[Touch] with UsingParallelExecution[Touch] {
 
   override def sudo: Touch = this.copy(usingSudo = true)
-
   override def par: Touch = this.copy(usingPar = true)
 }
 
@@ -75,29 +76,19 @@ case class Touch(hosts: Hosts, target: String,
  * @param user user
  */
 class Rm(hosts: Hosts, target: String, params: List[String] = Nil,
-         usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User)
-  extends GenericTask("rm", hosts, exec, params ::: List(target), usingSudo, usingPar) with UsingSudo[Rm] with UsingParallelExecution[Rm] {
+         usingSudo: Boolean = false, usingPar: Boolean = false,
+         exec: String = "/bin/rm", desc: String = "remove file(s)")(implicit user: User)
+  extends GenericTask("rm", desc, hosts, exec, params ::: List(target),
+    usingSudo, usingPar, taskRepr = s"$desc '$target'") with UsingSudo[Rm] with UsingParallelExecution[Rm] {
 
-  override def description: String = "remove file(s)"
-
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
-    LoggedRun(
-      verbose,
-      usingSudo,
-      usingPar,
-      hosts,
-      s"$description '${target}'",
-      task
-    )(verbose)
-
-  override def sudo: Rm = Rm(hosts, target, params, true, usingPar)
-
-  override def par: Rm = Rm(hosts, target, params, usingSudo, true)
+  override def sudo: Rm = Rm(hosts, target, params, true, usingPar, exec)
+  override def par: Rm = Rm(hosts, target, params, usingSudo, true, exec)
 }
 
 object Rm {
-  def apply(hosts: Hosts, target: String, params: List[String] = Nil, usingSudo: Boolean = false, usingPar: Boolean = false)(implicit user: User): Rm =
-    new Rm(hosts, target, params, usingSudo, usingPar)(user)
+  def apply(hosts: Hosts, target: String, params: List[String] = Nil, usingSudo: Boolean = false,
+            usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User): Rm =
+    new Rm(hosts, target, params, usingSudo, usingPar, exec)(user)
 }
 
 /**
@@ -109,9 +100,8 @@ object Rm {
  * @param user user
  */
 case class RmIfExists(hosts: Hosts, target: String, usingSudo: Boolean = false,
-                      usingPar: Boolean = false)(implicit user: User) extends Rm(hosts, target, List("-f"), usingSudo, usingPar)(user) {
-  override def description: String = "remove file(s) (if exists)"
-}
+                      usingPar: Boolean = false)(implicit user: User)
+  extends Rm(hosts, target, List("-f"), usingSudo, usingPar, desc = "remove file(s) (if exists)")(user)
 
 /**
  * Move file / dir task.
@@ -126,29 +116,18 @@ case class RmIfExists(hosts: Hosts, target: String, usingSudo: Boolean = false,
  */
 class Mv(hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
          usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/bin/mv")(implicit user: User)
-  extends GenericTask("mv", hosts, exec, params ::: List(source, destination), usingSudo, usingPar) with UsingSudo[Mv] with UsingParallelExecution[Mv] {
+  extends GenericTask("mv", "move file(s)", hosts, exec, params ::: List(source, destination),
+    usingSudo, usingPar, taskRepr = s"move file(s) '${source}' -> '${destination}'") with UsingSudo[Mv] with UsingParallelExecution[Mv] {
 
-  override def description: String = "move file(s)"
-
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
-    LoggedRun(
-      verbose,
-      usingSudo,
-      usingPar,
-      hosts,
-      s"$description '${source}' -> '${destination}'",
-      task
-    )(verbose)
-
-  override def sudo: Mv = Mv(hosts, source, destination, params, true, usingPar)
-
-  override def par: Mv = Mv(hosts, source, destination, params, usingSudo, true)
+  override def sudo: Mv = Mv(hosts, source, destination, params, true, usingPar, exec)
+  override def par: Mv = Mv(hosts, source, destination, params, usingSudo, true, exec)
 }
 
 object Mv {
   def apply(hosts: Hosts, source: String, destination: String,
-            params: List[String] = Nil, usingSudo: Boolean = false, usingPar: Boolean = false)(implicit user: User): Mv =
-    new Mv(hosts, source, destination, params, usingSudo, usingPar)(user)
+            params: List[String] = Nil, usingSudo: Boolean = false,
+            usingPar: Boolean = false, exec: String = "/bin/mv")(implicit user: User): Mv =
+    new Mv(hosts, source, destination, params, usingSudo, usingPar, exec)(user)
 }
 
 /**
@@ -165,29 +144,17 @@ object Mv {
 class Cp(hosts: Hosts, source: String, destination: String,
          params: List[String] = Nil, usingSudo: Boolean = false,
          usingPar: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User)
-  extends GenericTask("rsync", hosts, exec, params ::: List(source, destination), usingSudo, usingPar) with UsingSudo[Cp] with UsingParallelExecution[Cp] {
+  extends GenericTask("rsync", "copy file(s)", hosts, exec, params ::: List(source, destination),
+    usingSudo, usingPar, taskRepr = s"copy file(s) '${source}' -> '${destination}'") with UsingSudo[Cp] with UsingParallelExecution[Cp] {
 
-  override def description: String = "copy file(s)"
-
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
-    LoggedRun(
-      verbose,
-      usingSudo,
-      usingPar,
-      hosts,
-      s"$description '${source}' -> '${destination}'",
-      task
-    )(verbose)
-
-  override def sudo: Cp = Cp(hosts, source, destination, params, true, usingPar)
-
-  override def par: Cp = Cp(hosts, source, destination, params, usingSudo, true)
+  override def sudo: Cp = Cp(hosts, source, destination, params, true, usingPar, exec)
+  override def par: Cp = Cp(hosts, source, destination, params, usingSudo, true, exec)
 }
 
 object Cp {
   def apply(hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
-            sudo: Boolean = false, parallel: Boolean = false)(implicit user: User): Cp =
-    new Cp(hosts, source, destination, params, sudo, parallel)(user)
+            sudo: Boolean = false, parallel: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User): Cp =
+    new Cp(hosts, source, destination, params, sudo, parallel, exec)(user)
 
   def apply(hosts: Hosts, source: String, destination: String)(implicit user: User): Cp = Cp(hosts, source, destination, Nil)
 }
@@ -252,22 +219,10 @@ case class Upload(target: Hosts, source: String, destinationPath: String,
  */
 case class StopTomcat(hosts: Hosts, usingSudo: Boolean = false,
                       usingPar: Boolean = false, exec: String = "/etc/init.d/tomcat7")(implicit user: User)
-  extends GenericTask("tomcat", hosts, exec, List("stop"), usingSudo, usingPar, Stop) with UsingSudo[StopTomcat] with UsingParallelExecution[StopTomcat] {
-
-  override def description: String = "stop tomcat service"
-
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
-    LoggedRun(
-      verbose,
-      usingSudo,
-      usingPar,
-      hosts,
-      description,
-      task
-    )(verbose)
+  extends GenericTask("tomcat", "stop tomcat service", hosts, exec, List("stop"),
+    usingSudo, usingPar, Stop, "stop tomcat service") with UsingSudo[StopTomcat] with UsingParallelExecution[StopTomcat] {
 
   override def sudo: StopTomcat = this.copy(usingSudo = true)
-
   override def par: StopTomcat = this.copy(usingPar = true)
 }
 
@@ -281,22 +236,10 @@ case class StopTomcat(hosts: Hosts, usingSudo: Boolean = false,
  */
 case class StartTomcat(hosts: Hosts, usingSudo: Boolean = false,
                        usingPar: Boolean = false, exec: String = "/etc/init.d/tomcat7")(implicit user: User)
-  extends GenericTask("tomcat", hosts, exec, List("start"), usingSudo, usingPar) with UsingSudo[StartTomcat] with UsingParallelExecution[StartTomcat] {
-
-  override def description: String = "start tomcat service"
-
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
-    LoggedRun(
-      verbose,
-      usingSudo,
-      usingPar,
-      hosts,
-      description,
-      task
-    )(verbose)
+  extends GenericTask("tomcat", "start tomcat service", hosts, exec, List("start"),
+    usingSudo, usingPar, taskRepr = "start tomcat service") with UsingSudo[StartTomcat] with UsingParallelExecution[StartTomcat] {
 
   override def sudo: StartTomcat = this.copy(usingSudo = true)
-
   override def par: StartTomcat = this.copy(usingPar = true)
 }
 
@@ -467,4 +410,21 @@ object CheckUrl {
   final val DefaultPort = 8080
 }
 
-//TODO define extensible custom task template
+/**
+ * Download url.
+ *
+ * @param hosts hosts.
+ * @param url url to download.
+ * @param destinationPath destination path on hosts.
+ * @param usingSudo true, if sudo needed.
+ * @param usingPar true, if parallel execution required.
+ * @param user user.
+ */
+case class Download(hosts: Hosts, url: URL, destinationPath: String, usingSudo: Boolean = false,
+                usingPar: Boolean = false, exec: String = "/usr/bin/wget")(implicit user: User)
+  extends GenericTask("wget", "download url", hosts, exec, List(url.toString, "-P", destinationPath),
+    usingSudo, usingPar, taskRepr = s"download url '${url.toString}'") with UsingSudo[Download] with UsingParallelExecution[Download] {
+
+  override def sudo: Download = this.copy(usingSudo = true)
+  override def par: Download = this.copy(usingPar = true)
+}
