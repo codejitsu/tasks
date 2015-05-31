@@ -9,7 +9,7 @@ object Settings extends Build {
   lazy val buildSettings = Seq(
     name                  := "tasks",
     normalizedName        := "tasks",
-    organization          := "codejitsu",
+    organization          := "net.codejitsu",
     organizationHomepage  := Some(url("http://www.codejitsu.net")),
     scalaVersion          := Versions.ScalaVer,
     homepage              := Some(url("http://www.github.com/codejitsu/tasks"))
