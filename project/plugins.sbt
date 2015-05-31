@@ -6,4 +6,6 @@ addSbtPlugin("com.typesafe" % "sbt-abide" % "0.1-SNAPSHOT")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.4")
 
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.0")
+
 resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"
