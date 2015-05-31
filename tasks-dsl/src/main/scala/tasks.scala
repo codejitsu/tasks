@@ -442,3 +442,178 @@ case class Download(hosts: Hosts, url: URL, destinationPath: String, usingSudo: 
   override def sudo: Download = this.copy(usingSudo = true)
   override def par: Download = this.copy(usingPar = true)
 }
+
+case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[String] = Nil,
+                       checkResponseFun: (String => Boolean) = _ => true,
+                       checkStatusFun: (String => Boolean) = resp => resp.contains("200 OK"),
+                       port: Int = PostRequest.DefaultPort,
+                       usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/usr/bin/curl")(implicit user: User)
+  extends TaskM[Boolean] with UsingSudo[PostRequest] with UsingParallelExecution[PostRequest] {
+
+  private val tasks: collection.immutable.Seq[TaskM[Boolean]] = hosts.hosts.map { host =>
+    val process = s"curl to ${host.toString()}:$port$path" on Localhost ~> {
+      case Start => if (usingSudo) {
+        Sudo ~ Exec(exec, PostRequest.prepareParams(headers, data, host, path, port) :_*)
+      } else{
+        Exec(exec, PostRequest.prepareParams(headers, data, host, path, port) :_*)
+      }
+    }
+
+    new ShellTask(process, Start) {
+      private def mkCommandLog(host: String, verbose: VerbosityLevel): String = verbose match {
+        case Verbose => s"check post request response to $host:$port$path"
+        case Full => s"check post request response to $host:$port$path"
+        case _ => ""
+      }
+
+      private def printCommandLog(msg: String, color: String, statusMsg: String, verbose: VerbosityLevel): Unit = verbose match {
+        case Verbose | Full =>
+          println(s"$msg [$color $statusMsg ${Console.WHITE}]")
+        case _ =>
+      }
+
+      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+        val callRes = super.run(verbose)
+
+        val callSuccess = callRes._1 match {
+          case Success(true) => true
+          case _ => false
+        }
+
+        val output = callRes._2.mkString(" ")
+
+        val respRes = checkResponseFun(output)
+        println("CHECK BODY FUN: " + respRes)
+
+        val statusRes = checkStatusFun(output)
+        println("CHECK STATUS FUN: " + statusRes)
+
+        val resultSuccess = callSuccess && respRes && statusRes
+
+        val msg = mkCommandLog(host.toString(), verbose)
+
+        if (resultSuccess) {
+          printCommandLog(msg, Console.GREEN, "ok", verbose)
+          (Success(true), Nil, Nil)
+        } else {
+          printCommandLog(msg, Console.RED, "failed", verbose)
+          (Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
+        }
+      }
+    }
+  }
+
+  override def description: String = "make post request"
+
+  private def printTaskProgress(verbose: VerbosityLevel): Unit = verbose match {
+    case Verbose | Full =>
+      val h = if (hosts.hosts.nonEmpty) {
+        "(and " + (hosts.hosts.size - 1) + " other hosts)"
+      } else {
+        ""
+      }
+
+      val withPar = if(usingPar) {
+        s"${Console.GREEN}!!${Console.WHITE}"
+      } else {
+        ""
+      }
+
+      println(s"[ ${Console.YELLOW}*${Console.WHITE} $withPar] $description on ${hosts.hosts.head.toString()} $h")
+    case _ =>
+  }
+
+  override def run(verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+    printTaskProgress(verbose)
+
+    val tasksFold = if (usingPar) {
+      new TaskM[Boolean] {
+        override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+          import scala.concurrent.ExecutionContext.Implicits.global
+
+          val tasksF = tasks
+            .map(t => () => Future {
+            t.run(verbose)
+          })
+
+          val tasksFRes = Future.sequence(tasksF.map(_()))
+
+          val result = Await.result(tasksFRes, timeout)
+
+          val resultSuccess = result.map(_._1.isSuccess).forall(identity)
+
+          val resultOut = result.
+            filter(_._1.isSuccess).
+            map(_._2).
+            foldLeft(List.empty[String])((acc, out) => acc ++ out)
+
+          val resultErr = result.
+            filter(_._1.isSuccess).
+            map(_._3).
+            foldLeft(List.empty[String])((acc, err) => acc ++ err)
+
+          if (resultSuccess) {
+            (Success(true), resultOut, resultErr)
+          } else {
+            (Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+          }
+        }
+      }
+    } else {
+      tasks.foldLeft[TaskM[Boolean]](EmptyTask)((acc, t) => acc flatMap(_ => t))
+    }
+
+    val result = tasksFold.run(verbose)
+
+    verbose match {
+      case Verbose | Full => println("--------------------------------------------------------------")
+      case _ =>
+    }
+
+    result
+  }
+
+  override def sudo: PostRequest = this.copy(usingSudo = true)
+  override def par: PostRequest = this.copy(usingPar = true)
+}
+
+object PostRequest {
+  final val DefaultPort = 8080
+
+  def prepareParams(headers: List[String], data: String, host: Host, path: String, port: Int): List[String] = {
+    val postData: List[String] =
+      List("--trace", "-", "-X", "POST") ++
+        headers.map(h => s" -H $h") ++
+        List(s" -d $data ") ++ List(s"${host.toString()}:$port$path")
+
+    postData
+  }
+}
+
+case class InstallDeb(hosts: Hosts, packFile: String, usingSudo: Boolean = false,
+                      usingPar: Boolean = false, exec: String = "/usr/bin/dpkg")(implicit user: User)
+  extends GenericTask("dpkg", "install debian package", hosts, exec, List("-i", packFile),
+    usingSudo, usingPar, taskRepr = s"install debian package '$packFile'") with UsingSudo[InstallDeb] with UsingParallelExecution[InstallDeb] {
+
+  override def sudo: InstallDeb = this.copy(usingSudo = true)
+  override def par: InstallDeb = this.copy(usingPar = true)
+}
+
+case class StartService(hosts: Hosts, service: String, usingSudo: Boolean = false,
+                      usingPar: Boolean = false, exec: String = "/etc/init.d/")(implicit user: User)
+  extends GenericTask("service", "start service", hosts, s"$exec$service", List("start"),
+    usingSudo, usingPar, taskRepr = s"start service '$service'") with UsingSudo[StartService] with UsingParallelExecution[StartService] {
+
+  override def sudo: StartService = this.copy(usingSudo = true)
+  override def par: StartService = this.copy(usingPar = true)
+}
+
+case class StopService(hosts: Hosts, service: String, usingSudo: Boolean = false,
+                        usingPar: Boolean = false, exec: String = "/etc/init.d/")(implicit user: User)
+  extends GenericTask("service", "stop service", hosts, s"$exec$service", List("stop"),
+    usingSudo, usingPar, cmd = Stop, taskRepr = s"stop service '$service'")
+  with UsingSudo[StopService] with UsingParallelExecution[StopService] {
+
+  override def sudo: StopService = this.copy(usingSudo = true)
+  override def par: StopService = this.copy(usingPar = true)
+}

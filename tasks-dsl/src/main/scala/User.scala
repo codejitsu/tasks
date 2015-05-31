@@ -14,6 +14,8 @@ sealed trait User {
 
   lazy val localName: String = System.getProperty("user.name")
   lazy val localPassword: PasswordFunc = () => StdIn.readLine("Please enter your passphrase:").toCharArray
+
+  lazy val home: String = s"/home/$username"
 }
 
 case object NoUser extends User {
