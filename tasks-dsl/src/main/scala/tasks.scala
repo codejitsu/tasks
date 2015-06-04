@@ -35,7 +35,7 @@ abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: Strin
     procs ! cmd
   }
 
-  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) =
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
     LoggedRun(
       verbose,
       usingSudo,
@@ -207,7 +207,7 @@ case class Upload(target: Hosts, source: String, destinationPath: String,
 
   override def description: String = "upload file(s)"
 
-  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) =
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
     LoggedRun(
       verbose,
       usingSudo,
@@ -264,7 +264,7 @@ case class StartTomcat(hosts: Hosts, usingSudo: Boolean = false,
 case class Wait(d: Duration) extends TaskM[Boolean] {
   override def description: String = "waiting"
 
-  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) =
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
     LoggedRun(
       verbose,
       false,
@@ -272,15 +272,15 @@ case class Wait(d: Duration) extends TaskM[Boolean] {
       Localhost,
       s"$description for ${d.toString}",
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel): TaskResult[Boolean] = {
           val promise = Promise[Unit]
 
           val result = try {
             Await.ready(promise.future, d)
-            (Failure(new TaskExecutionError(Nil)), Nil, Nil)
+            TaskResult[Boolean](Failure(new TaskExecutionError(Nil)), Nil, Nil)
           } catch {
-            case t: TimeoutException => (Success(true), Nil, Nil)
-            case e: Throwable => (Failure(new TaskExecutionError(List(e.getMessage))), Nil, Nil)
+            case t: TimeoutException => TaskResult[Boolean](Success(true), Nil, Nil)
+            case e: Throwable => TaskResult[Boolean](Failure(new TaskExecutionError(List(e.getMessage))), Nil, Nil)
           }
 
           result
@@ -316,7 +316,7 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
         case _ =>
       }
 
-      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
         import scala.io.Source
 
         val prot = if (host.toString().startsWith("http://")) {
@@ -337,10 +337,10 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
 
         if (resultSuccess) {
           printCommandLog(msg, Console.GREEN, "ok", verbose)
-          (Success(true), Nil, Nil)
+          TaskResult(Success(true), Nil, Nil)
         } else {
           printCommandLog(msg, Console.RED, "failed", verbose)
-          (Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
+          TaskResult(Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
         }
       }
     }
@@ -366,12 +366,12 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
     case _ =>
   }
 
-  override def run(verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+  override def run(verbose: VerbosityLevel): TaskResult[Boolean] = {
     printTaskProgress(verbose)
 
     val tasksFold = if (usingPar) {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
           import scala.concurrent.ExecutionContext.Implicits.global
 
           val tasksF = tasks
@@ -383,22 +383,22 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
 
           val result = Await.result(tasksFRes, timeout)
 
-          val resultSuccess = result.map(_._1.isSuccess).forall(identity)
+          val resultSuccess = result.map(_.res.isSuccess).forall(identity)
 
           val resultOut = result.
-            filter(_._1.isSuccess).
-            map(_._2).
+            filter(_.res.isSuccess).
+            map(_.out).
             foldLeft(List.empty[String])((acc, out) => acc ++ out)
 
           val resultErr = result.
-            filter(_._1.isSuccess).
-            map(_._3).
+            filter(_.res.isSuccess).
+            map(_.err).
             foldLeft(List.empty[String])((acc, err) => acc ++ err)
 
           if (resultSuccess) {
-            (Success(true), resultOut, resultErr)
+            TaskResult(Success(true), resultOut, resultErr)
           } else {
-            (Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }
@@ -471,21 +471,19 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
         case _ =>
       }
 
-      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
         val callRes = super.run(verbose)
 
-        val callSuccess = callRes._1 match {
+        val callSuccess = callRes.res match {
           case Success(true) => true
           case _ => false
         }
 
-        val output = callRes._2.mkString(" ")
+        val output = callRes.out.mkString(" ")
 
         val respRes = checkResponseFun(output)
-        println("CHECK BODY FUN: " + respRes)
 
         val statusRes = checkStatusFun(output)
-        println("CHECK STATUS FUN: " + statusRes)
 
         val resultSuccess = callSuccess && respRes && statusRes
 
@@ -493,10 +491,10 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
 
         if (resultSuccess) {
           printCommandLog(msg, Console.GREEN, "ok", verbose)
-          (Success(true), Nil, Nil)
+          TaskResult(Success(true), Nil, Nil)
         } else {
           printCommandLog(msg, Console.RED, "failed", verbose)
-          (Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
+          TaskResult(Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
         }
       }
     }
@@ -522,12 +520,12 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
     case _ =>
   }
 
-  override def run(verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+  override def run(verbose: VerbosityLevel): TaskResult[Boolean] = {
     printTaskProgress(verbose)
 
     val tasksFold = if (usingPar) {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
           import scala.concurrent.ExecutionContext.Implicits.global
 
           val tasksF = tasks
@@ -539,22 +537,22 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
 
           val result = Await.result(tasksFRes, timeout)
 
-          val resultSuccess = result.map(_._1.isSuccess).forall(identity)
+          val resultSuccess = result.map(_.res.isSuccess).forall(identity)
 
           val resultOut = result.
-            filter(_._1.isSuccess).
-            map(_._2).
+            filter(_.res.isSuccess).
+            map(_.out).
             foldLeft(List.empty[String])((acc, out) => acc ++ out)
 
           val resultErr = result.
-            filter(_._1.isSuccess).
-            map(_._3).
+            filter(_.res.isSuccess).
+            map(_.err).
             foldLeft(List.empty[String])((acc, err) => acc ++ err)
 
           if (resultSuccess) {
-            (Success(true), resultOut, resultErr)
+            TaskResult(Success(true), resultOut, resultErr)
           } else {
-            (Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }

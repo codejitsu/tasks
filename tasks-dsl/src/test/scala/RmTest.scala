@@ -24,9 +24,9 @@ class RmTest extends FlatSpec with Matchers {
 
     val touchResult = touchTask.run()
 
-    touchResult._1.isSuccess should be (true)
-    touchResult._2 should be (empty)
-    touchResult._3 should be (empty)
+    touchResult.res.isSuccess should be (true)
+    touchResult.out should be (empty)
+    touchResult.err should be (empty)
 
     file2create.exists should be (true)
 
@@ -34,9 +34,9 @@ class RmTest extends FlatSpec with Matchers {
 
     val rmResult = rmTask.run()
 
-    rmResult._1.isSuccess should be (true)
-    rmResult._2 should be (empty)
-    rmResult._3 should be (empty)
+    rmResult.res.isSuccess should be (true)
+    rmResult.out should be (empty)
+    rmResult.err should be (empty)
 
     file2create.exists should be (false)
   }
@@ -55,9 +55,9 @@ class RmTest extends FlatSpec with Matchers {
 
     val result = task.run()
 
-    result._1.isSuccess should be (true)
-    result._2 should be (empty)
-    result._3 should be (empty)
+    result.res.isSuccess should be (true)
+    result.out should be (empty)
+    result.err should be (empty)
 
     file2create.exists should be (false)
   }
@@ -75,9 +75,9 @@ class RmTest extends FlatSpec with Matchers {
 
     val result = task.run()
 
-    result._1.isSuccess should be (true)
-    result._2 should be (empty)
-    result._3 should be (empty)
+    result.res.isSuccess should be (true)
+    result.out should be (empty)
+    result.err should be (empty)
 
     file2create.exists should be (false)
   }
@@ -97,7 +97,7 @@ class RmTest extends FlatSpec with Matchers {
 
     val result = task.run()
 
-    result._1.isSuccess should be (false)
+    result.res.isSuccess should be (false)
     file2create.exists should be (false)
   }
 }

@@ -27,9 +27,9 @@ class CpTest extends FlatSpec with Matchers {
 
     val touchResult = touchTask.run()
 
-    touchResult._1.isSuccess should be (true)
-    touchResult._2 should be (empty)
-    touchResult._3 should be (empty)
+    touchResult.res.isSuccess should be (true)
+    touchResult.out should be (empty)
+    touchResult.err should be (empty)
 
     file2create.exists should be (true)
 
@@ -37,9 +37,9 @@ class CpTest extends FlatSpec with Matchers {
 
     val copyResult = copyTask.run()
 
-    copyResult._1.isSuccess should be (true)
-    copyResult._2 should be (empty)
-    copyResult._3 should be (empty)
+    copyResult.res.isSuccess should be (true)
+    copyResult.out should be (empty)
+    copyResult.err should be (empty)
 
     file2copy.exists should be (true)
   }
@@ -61,9 +61,9 @@ class CpTest extends FlatSpec with Matchers {
 
     val result = task.run()
 
-    result._1.isSuccess should be (true)
-    result._2 should be (empty)
-    result._3 should be (empty)
+    result.res.isSuccess should be (true)
+    result.out should be (empty)
+    result.err should be (empty)
 
     file2copy.exists should be (true)
   }
@@ -84,9 +84,9 @@ class CpTest extends FlatSpec with Matchers {
 
     val result = task.run()
 
-    result._1.isSuccess should be (true)
-    result._2 should be (empty)
-    result._3 should be (empty)
+    result.res.isSuccess should be (true)
+    result.out should be (empty)
+    result.err should be (empty)
 
     file2copy.exists should be (true)
   }
@@ -108,7 +108,7 @@ class CpTest extends FlatSpec with Matchers {
 
     val result = task.run()
 
-    result._1.isSuccess should be (false)
+    result.res.isSuccess should be (false)
 
     file2copy.exists should be (false)
   }

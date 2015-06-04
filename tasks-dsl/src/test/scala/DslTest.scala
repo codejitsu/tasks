@@ -278,14 +278,14 @@ class DslTest extends FlatSpec with Matchers {
     val startShell = program ! Start
     val startResult = startShell.run()
 
-    startResult._1.isSuccess should be (true)
-    startResult._2 should be (List("start test program"))
+    startResult.res.isSuccess should be (true)
+    startResult.out should be (List("start test program"))
 
     val stopShell = program ! Stop
     val stopResult = stopShell.run()
 
-    stopResult._1.isSuccess should be (true)
-    stopResult._2 should be (List("stop test program"))
+    stopResult.res.isSuccess should be (true)
+    stopResult.out should be (List("stop test program"))
   }
 
   it should "compose processes on localhost" in {
@@ -303,8 +303,8 @@ class DslTest extends FlatSpec with Matchers {
     val composed = startShell andThen stopShell
     val composedResult = composed.run()
 
-    composedResult._1.isSuccess should be (true)
-    composedResult._2 should be (List("start test program", "stop test program"))
+    composedResult.res.isSuccess should be (true)
+    composedResult.out should be (List("start test program", "stop test program"))
   }
 
   it should "compose processes on monadic way" in {
@@ -326,8 +326,8 @@ class DslTest extends FlatSpec with Matchers {
 
     val composedResult = composed.run()
 
-    composedResult._1.isSuccess should be (true)
-    composedResult._2 should be (List("start test program", "stop test program"))
+    composedResult.res.isSuccess should be (true)
+    composedResult.out should be (List("start test program", "stop test program"))
   }
 
   it should "compose processes on monadic way (one task)" in {
@@ -347,8 +347,8 @@ class DslTest extends FlatSpec with Matchers {
 
     val composedResult = composed.run()
 
-    composedResult._1.isSuccess should be (true)
-    composedResult._2 should be (List("start test program"))
+    composedResult.res.isSuccess should be (true)
+    composedResult.out should be (List("start test program"))
   }
 
   it should "compose processes on monadic way (failure)" in {
@@ -370,7 +370,7 @@ class DslTest extends FlatSpec with Matchers {
 
     val composedResult = composed.run()
 
-    composedResult._1.isSuccess should be (false)
+    composedResult.res.isSuccess should be (false)
   }
 
   it should "run processes sequentially" in {
@@ -398,10 +398,10 @@ class DslTest extends FlatSpec with Matchers {
 
     val composedResult = startAllProcsSeq.run()
 
-    composedResult._1.isSuccess should be (true)
-    composedResult._2 should be (List("start test program with param: 1", "start test program with param: 2",
+    composedResult.res.isSuccess should be (true)
+    composedResult.out should be (List("start test program with param: 1", "start test program with param: 2",
       "start test program with param: 3", "start test program with param: 4"))
-    composedResult._3 should be (empty)
+    composedResult.err should be (empty)
   }
 
   it should "run processes parallel" in {
@@ -429,11 +429,11 @@ class DslTest extends FlatSpec with Matchers {
 
     val composedResult = startAllProcsSeq.run()
 
-    composedResult._1.isSuccess should be (true)
-    composedResult._2 should have size (4)
-    composedResult._2 should contain allOf ("start test program with param: 1", "start test program with param: 2",
+    composedResult.res.isSuccess should be (true)
+    composedResult.out should have size (4)
+    composedResult.out should contain allOf ("start test program with param: 1", "start test program with param: 2",
       "start test program with param: 3", "start test program with param: 4")
-    composedResult._3 should be (empty)
+    composedResult.err should be (empty)
   }
 
   it should "preserve the execution order" in {
@@ -456,35 +456,35 @@ class DslTest extends FlatSpec with Matchers {
     }
 
     val task1 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program1 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program1 ! Start).run()
     }
 
     val task2 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program2 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program2 ! Start).run()
     }
 
     val task3 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program3 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program3 ! Start).run()
     }
 
     val task4 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program4 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program4 ! Start).run()
     }
 
     val composed = task1 andThen task2 andThen task3 andThen task4
     val composedResult1 = composed()
 
-    composedResult1._1.isSuccess should be (true)
-    composedResult1._2 should be (List("start test program with param: 1", "start test program with param: 2",
+    composedResult1.res.isSuccess should be (true)
+    composedResult1.out should be (List("start test program with param: 1", "start test program with param: 2",
       "start test program with param: 3", "start test program with param: 4"))
-    composedResult1._3 should be (empty)
+    composedResult1.err should be (empty)
 
     val composedResult2 = composed()
 
-    composedResult2._1.isSuccess should be (true)
-    composedResult2._2 should be (List("start test program with param: 1", "start test program with param: 2",
+    composedResult2.res.isSuccess should be (true)
+    composedResult2.out should be (List("start test program with param: 1", "start test program with param: 2",
       "start test program with param: 3", "start test program with param: 4"))
-    composedResult2._3 should be (empty)
+    composedResult2.err should be (empty)
   }
 
 /*

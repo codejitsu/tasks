@@ -7,6 +7,8 @@ import scala.util.{Failure, Success, Try}
 
 class TaskExecutionError(err: List[String]) extends Exception(err.mkString)
 
+case class TaskResult[+R](res: Try[R], out: List[String], err: List[String])
+
 trait Description {
   def description: String = ""
 }
@@ -25,29 +27,30 @@ trait UsingParallelExecution[T <: UsingParallelExecution[T]] {
 trait TaskM[+R] extends Description {
   self =>
 
-  def run(verbose: VerbosityLevel = NoOutput): (Try[R], List[String], List[String])
+  def run(verbose: VerbosityLevel = NoOutput): TaskResult[R]
 
-  def apply(): (Try[R], List[String], List[String]) = run()
+  def apply(): TaskResult[R] = run()
 
   def andThen[T >: R](task: TaskM[T]): TaskM[T] = this flatMap (_ => task)
 
   def map[U](f: R => U): TaskM[U] = new TaskM[U] {
-    override def run(verbose: VerbosityLevel = NoOutput): (Try[U], List[String], List[String]) = {
-      val (selfRes, out, err) = self.run(verbose)
-      (selfRes.map(f), out, err)
+    override def run(verbose: VerbosityLevel = NoOutput): TaskResult[U] = {
+      val selfRes = self.run(verbose)
+      selfRes.copy(res = selfRes.res.map(f))
     }
   }
 
   def flatMap[T >: R](f: R => TaskM[T]): TaskM[T] = new TaskM[T] {
-    override def run(verbose: VerbosityLevel = NoOutput): (Try[T], List[String], List[String]) = {
-      val (selfRes, out, err) = self.run(verbose)
+    override def run(verbose: VerbosityLevel = NoOutput): TaskResult[T] = {
+      val selfRes = self.run(verbose)
 
-      selfRes match {
+      selfRes.res match {
         case Success(r) =>
-          val (nextRes, nout, nerr) = f(r).run(verbose)
-          (nextRes, out ++ nout, err ++ nerr)
+          val nextRes = f(r).run(verbose)
 
-        case Failure(e) => (Failure(e), out, err)
+          nextRes.copy(out = selfRes.out ++ nextRes.out, err = selfRes.err ++ nextRes.err)
+
+        case _ => selfRes
       }
     }
   }
@@ -55,8 +58,8 @@ trait TaskM[+R] extends Description {
 
 object LoggedRun {
   def apply[R](verbose: VerbosityLevel, usingSudo: Boolean, usingPar: Boolean,
-             hosts: Hosts, desc: String, task: TaskM[R]): (VerbosityLevel => (Try[R], List[String], List[String])) = {
-    val logRun: (VerbosityLevel => (Try[R], List[String], List[String])) = { v =>
+             hosts: Hosts, desc: String, task: TaskM[R]): (VerbosityLevel => TaskResult[R]) = {
+    val logRun: (VerbosityLevel => TaskResult[R]) = { v =>
       verbose match {
         case Verbose | FullOutput =>
           val withSudo = if(usingSudo) {
@@ -97,18 +100,18 @@ object LoggedRun {
 }
 
 case class FailedTask(out: List[String], err: List[String]) extends TaskM[Boolean] {
-  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (Failure(new TaskExecutionError(Nil)), Nil, Nil)
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Failure(new TaskExecutionError(Nil)), Nil, Nil)
 }
 
 case object EmptyTask extends TaskM[Boolean] {
-  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (Success(true), Nil, Nil)
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(true), Nil, Nil)
 }
 
 class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) extends TaskM[Boolean] {
   import scala.collection.mutable.ListBuffer
   import scala.sys.process._
 
-  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = op match {
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = op match {
     case Start => execute(ctx.startCmd, verbose)
 
     case Stop => execute(ctx.stopCmd, verbose)
@@ -144,7 +147,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     case _ =>
   }
 
-  private def executeLocal(cmd: CommandLine, verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+  private def executeLocal(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = {
     val out = ListBuffer[String]()
     val err = ListBuffer[String]()
 
@@ -167,14 +170,14 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
         case _ =>
       }
 
-      (Success(true), out.toList, err.toList)
+      TaskResult(Success(true), out.toList, err.toList)
     } else {
       verbose match {
         case Verbose | FullOutput => println(s"$msg [${Console.RED} failed ${Console.RESET}]")
         case _ =>
       }
 
-      (Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+      TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
     }
   }
 
@@ -195,7 +198,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }
 
-  private def executeRemoteSsh(remoteHost: Host, cmd: CommandLine, verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = {
+  private def executeRemoteSsh(remoteHost: Host, cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = {
     val out = ListBuffer[String]()
     val err = ListBuffer[String]()
 
@@ -226,15 +229,15 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     if (result == 0) {
       printCommandLog(msg, Console.GREEN, statusMsg, commandLine, verbose)
 
-      (Success(true), out.toList, err.toList)
+      TaskResult(Success(true), out.toList, err.toList)
     } else {
       printCommandLog(msg, Console.RED, statusMsg, commandLine, verbose)
 
-      (Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+      TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
     }
   }
 
-  private def execute(cmd: CommandLine, verbose: VerbosityLevel): (Try[Boolean], List[String], List[String]) = ctx.host match {
+  private def execute(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = ctx.host match {
     case Localhost => executeLocal(cmd, verbose)
     case remoteHost: Host => executeRemoteSsh(remoteHost, cmd, verbose)
   }

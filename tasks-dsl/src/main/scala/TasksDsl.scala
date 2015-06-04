@@ -141,7 +141,7 @@ object Tasks {
 
     def !! (op: Command)(implicit user: User, timeout: Duration): TaskM[Boolean] = {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
           val tasksF = ctx.procs
             .map(_ ! op)
             .map(t => () => Future {
@@ -152,22 +152,22 @@ object Tasks {
 
           val result = Await.result(tasksFRes, timeout)
 
-          val resultSuccess = result.map(_._1.isSuccess).forall(identity)
+          val resultSuccess = result.map(_.res.isSuccess).forall(identity)
 
           val resultOut = result.
-            filter(_._1.isSuccess).
-            map(_._2).
+            filter(_.res.isSuccess).
+            map(_.out).
             foldLeft(List.empty[String])((acc, out) => acc ++ out)
 
           val resultErr = result.
-            filter(_._1.isSuccess).
-            map(_._3).
+            filter(_.res.isSuccess).
+            map(_.err).
             foldLeft(List.empty[String])((acc, err) => acc ++ err)
 
           if (resultSuccess) {
-            (Success(true), resultOut, resultErr)
+            TaskResult(Success(true), resultOut, resultErr)
           } else {
-            (Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }

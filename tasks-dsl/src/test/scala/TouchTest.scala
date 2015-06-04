@@ -25,9 +25,9 @@ class TouchTest extends FlatSpec with Matchers {
 
     val touchResult = touchTask.run()
 
-    touchResult._1.isSuccess should be (true)
-    touchResult._2 should be (empty)
-    touchResult._3 should be (empty)
+    touchResult.res.isSuccess should be (true)
+    touchResult.out should be (empty)
+    touchResult.err should be (empty)
 
     file2create.exists should be (true)
 
