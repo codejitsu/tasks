@@ -67,13 +67,13 @@ object LoggedRun {
       verbose match {
         case Verbose | Full =>
           val withSudo = if(usingSudo) {
-            s"${Console.GREEN}sudo${Console.WHITE}"
+            s"${Console.GREEN}sudo${Console.RESET}"
           } else {
             ""
           }
 
           val withPar = if(usingPar) {
-            s"${Console.GREEN}!!${Console.WHITE}"
+            s"${Console.GREEN}!!${Console.RESET}"
           } else {
             ""
           }
@@ -84,7 +84,7 @@ object LoggedRun {
             ""
           }
 
-          println(s"[ ${Console.YELLOW}*${Console.WHITE} $withSudo $withPar] $desc " +
+          println(s"[ ${Console.YELLOW}*${Console.RESET} $withSudo $withPar] $desc " +
             s"on ${hosts.hosts.head.toString()}$h")
         case _ =>
       }
@@ -141,7 +141,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
   private def printCommandLog(msg: String, color: String, statusMsg: String, commandLine: List[String],
                               verbose: VerbosityLevel): Unit = verbose match {
     case Verbose | Full =>
-      println(s"$msg [$color $statusMsg ${Console.WHITE}]")
+      println(s"$msg [$color $statusMsg ${Console.RESET}]")
 
       verbose match {
         case Full => println(s"SSH: ${commandLine.mkString(" ")}")
@@ -170,14 +170,14 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     if (result == 0) {
       verbose match {
-        case Verbose | Full => println(s"$msg [${Console.GREEN} ok ${Console.WHITE}]")
+        case Verbose | Full => println(s"$msg [${Console.GREEN} ok ${Console.RESET}]")
         case _ =>
       }
 
       (Success(true), out.toList, err.toList)
     } else {
       verbose match {
-        case Verbose | Full => println(s"$msg [${Console.RED} failed ${Console.WHITE}]")
+        case Verbose | Full => println(s"$msg [${Console.RED} failed ${Console.RESET}]")
         case _ =>
       }
 

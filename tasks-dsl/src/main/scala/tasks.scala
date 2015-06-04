@@ -313,7 +313,7 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
 
       private def printCommandLog(msg: String, color: String, statusMsg: String, verbose: VerbosityLevel): Unit = verbose match {
         case Verbose | Full =>
-          println(s"$msg [$color $statusMsg ${Console.WHITE}]")
+          println(s"$msg [$color $statusMsg ${Console.RESET}]")
         case _ =>
       }
 
@@ -358,12 +358,12 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
       }
 
       val withPar = if(usingPar) {
-        s"${Console.GREEN}!!${Console.WHITE}"
+        s"${Console.GREEN}!!${Console.RESET}"
       } else {
         ""
       }
 
-      println(s"[ ${Console.YELLOW}*${Console.WHITE} $withPar] $description on ${hosts.hosts.head.toString()} $h")
+      println(s"[ ${Console.YELLOW}*${Console.RESET} $withPar] $description on ${hosts.hosts.head.toString()} $h")
     case _ =>
   }
 
@@ -468,7 +468,7 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
 
       private def printCommandLog(msg: String, color: String, statusMsg: String, verbose: VerbosityLevel): Unit = verbose match {
         case Verbose | Full =>
-          println(s"$msg [$color $statusMsg ${Console.WHITE}]")
+          println(s"$msg [$color $statusMsg ${Console.RESET}]")
         case _ =>
       }
 
@@ -514,12 +514,12 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
       }
 
       val withPar = if(usingPar) {
-        s"${Console.GREEN}!!${Console.WHITE}"
+        s"${Console.GREEN}!!${Console.RESET}"
       } else {
         ""
       }
 
-      println(s"[ ${Console.YELLOW}*${Console.WHITE} $withPar] $description on ${hosts.hosts.head.toString()} $h")
+      println(s"[ ${Console.YELLOW}*${Console.RESET} $withPar] $description on ${hosts.hosts.head.toString()} $h")
     case _ =>
   }
 
