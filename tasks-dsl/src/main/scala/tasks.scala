@@ -5,8 +5,7 @@ package net.codejitsu.tasks.dsl
 import java.net.URL
 import java.util.concurrent.TimeoutException
 
-import net.codejitsu.tasks.dsl.Dsl._
-import net.codejitsu.tasks.dsl.VerbosityLevel.{VerbosityLevel, _}
+import net.codejitsu.tasks.dsl.Tasks._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future, Promise}
@@ -36,7 +35,7 @@ abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: Strin
     procs ! cmd
   }
 
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
+  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) =
     LoggedRun(
       verbose,
       usingSudo,
@@ -208,7 +207,7 @@ case class Upload(target: Hosts, source: String, destinationPath: String,
 
   override def description: String = "upload file(s)"
 
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
+  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) =
     LoggedRun(
       verbose,
       usingSudo,
@@ -265,7 +264,7 @@ case class StartTomcat(hosts: Hosts, usingSudo: Boolean = false,
 case class Wait(d: Duration) extends TaskM[Boolean] {
   override def description: String = "waiting"
 
-  override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) =
+  override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) =
     LoggedRun(
       verbose,
       false,
@@ -307,17 +306,17 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
     new TaskM[Boolean] {
       private def mkCommandLog(host: String, verbose: VerbosityLevel): String = verbose match {
         case Verbose => s"check $host:$port$path"
-        case Full => s"check $host:$port$path"
+        case FullOutput => s"check $host:$port$path"
         case _ => ""
       }
 
       private def printCommandLog(msg: String, color: String, statusMsg: String, verbose: VerbosityLevel): Unit = verbose match {
-        case Verbose | Full =>
+        case Verbose | FullOutput =>
           println(s"$msg [$color $statusMsg ${Console.RESET}]")
         case _ =>
       }
 
-      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
         import scala.io.Source
 
         val prot = if (host.toString().startsWith("http://")) {
@@ -350,7 +349,7 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
   override def description: String = "check url"
 
   private def printTaskProgress(verbose: VerbosityLevel): Unit = verbose match {
-    case Verbose | Full =>
+    case Verbose | FullOutput =>
       val h = if (hosts.hosts.nonEmpty) {
         "(and " + (hosts.hosts.size - 1) + " other hosts)"
       } else {
@@ -372,7 +371,7 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
 
     val tasksFold = if (usingPar) {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
           import scala.concurrent.ExecutionContext.Implicits.global
 
           val tasksF = tasks
@@ -410,7 +409,7 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
     val result = tasksFold.run(verbose)
 
     verbose match {
-      case Verbose | Full => println("--------------------------------------------------------------")
+      case Verbose | FullOutput => println("--------------------------------------------------------------")
       case _ =>
     }
 
@@ -462,17 +461,17 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
     new ShellTask(process, Start) {
       private def mkCommandLog(host: String, verbose: VerbosityLevel): String = verbose match {
         case Verbose => s"check post request response to $host:$port$path"
-        case Full => s"check post request response to $host:$port$path"
+        case FullOutput => s"check post request response to $host:$port$path"
         case _ => ""
       }
 
       private def printCommandLog(msg: String, color: String, statusMsg: String, verbose: VerbosityLevel): Unit = verbose match {
-        case Verbose | Full =>
+        case Verbose | FullOutput =>
           println(s"$msg [$color $statusMsg ${Console.RESET}]")
         case _ =>
       }
 
-      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
         val callRes = super.run(verbose)
 
         val callSuccess = callRes._1 match {
@@ -506,7 +505,7 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
   override def description: String = "make post request"
 
   private def printTaskProgress(verbose: VerbosityLevel): Unit = verbose match {
-    case Verbose | Full =>
+    case Verbose | FullOutput =>
       val h = if (hosts.hosts.nonEmpty) {
         "(and " + (hosts.hosts.size - 1) + " other hosts)"
       } else {
@@ -528,7 +527,7 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
 
     val tasksFold = if (usingPar) {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
           import scala.concurrent.ExecutionContext.Implicits.global
 
           val tasksF = tasks
@@ -566,7 +565,7 @@ case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[S
     val result = tasksFold.run(verbose)
 
     verbose match {
-      case Verbose | Full => println("--------------------------------------------------------------")
+      case Verbose | FullOutput => println("--------------------------------------------------------------")
       case _ =>
     }
 

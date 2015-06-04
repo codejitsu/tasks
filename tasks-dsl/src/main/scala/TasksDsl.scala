@@ -2,8 +2,6 @@
 
 package net.codejitsu.tasks.dsl
 
-import net.codejitsu.tasks.dsl.VerbosityLevel._
-
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success, Try}
@@ -11,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 /**
  * DSL for tasks scripting.
  */
-object Dsl {
+object Tasks {
   implicit class HostStringOps(val ctx: String) {
     def ~ (part: String): Host = Host(List(HostPart(ctx), HostPart(part)))
 
@@ -143,7 +141,7 @@ object Dsl {
 
     def !! (op: Command)(implicit user: User, timeout: Duration): TaskM[Boolean] = {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = {
+        override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = {
           val tasksF = ctx.procs
             .map(_ ! op)
             .map(t => () => Future {

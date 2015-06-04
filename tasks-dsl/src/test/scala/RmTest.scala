@@ -9,7 +9,7 @@ import org.scalatest.{FlatSpec, Matchers}
  */
 class RmTest extends FlatSpec with Matchers {
   import scala.concurrent.duration._
-  import Dsl._
+  import Tasks._
 
   implicit val timeout = 30 seconds
 

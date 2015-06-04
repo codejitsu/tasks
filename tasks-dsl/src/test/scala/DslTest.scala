@@ -1,6 +1,5 @@
 package net.codejitsu.tasks.dsl
 
-import net.codejitsu.tasks.dsl.VerbosityLevel._
 import org.scalatest.{Matchers, FlatSpec}
 
 import scala.util.Try
@@ -9,7 +8,7 @@ import scala.util.Try
  * DSL tests.
  */
 class DslTest extends FlatSpec with Matchers {
-  import Dsl._
+  import Tasks._
   import scala.concurrent.duration._
 
   implicit val timeout = 30 seconds
@@ -457,19 +456,19 @@ class DslTest extends FlatSpec with Matchers {
     }
 
     val task1 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = (program1 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program1 ! Start).run()
     }
 
     val task2 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = (program2 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program2 ! Start).run()
     }
 
     val task3 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = (program3 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program3 ! Start).run()
     }
 
     val task4 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = No): (Try[Boolean], List[String], List[String]) = (program4 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput): (Try[Boolean], List[String], List[String]) = (program4 ! Start).run()
     }
 
     val composed = task1 andThen task2 andThen task3 andThen task4
