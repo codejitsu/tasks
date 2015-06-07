@@ -113,10 +113,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
   override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = op match {
     case Start => execute(ctx.startCmd, verbose)
-
     case Stop => execute(ctx.stopCmd, verbose)
-
-    case _ => ???
   }
 
   def doOut(out: ListBuffer[String], verbose: VerbosityLevel)(line: String): Unit = {
@@ -147,7 +144,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     case _ =>
   }
 
-  private def executeLocal(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = {
+  private def executeOnLocalhost(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = {
     val out = ListBuffer[String]()
     val err = ListBuffer[String]()
 
@@ -166,14 +163,14 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     if (result == 0) {
       verbose match {
-        case Verbose | FullOutput => println(s"$msg [${Console.GREEN} ok ${Console.RESET}]")
+        case Verbose | FullOutput => doOut(out, verbose)(s"$msg [${Console.GREEN} ok ${Console.RESET}]")
         case _ =>
       }
 
       TaskResult(Success(true), out.toList, err.toList)
     } else {
       verbose match {
-        case Verbose | FullOutput => println(s"$msg [${Console.RED} failed ${Console.RESET}]")
+        case Verbose | FullOutput => doOut(err, verbose)(s"$msg [${Console.RED} failed ${Console.RESET}]")
         case _ =>
       }
 
@@ -238,7 +235,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
   }
 
   private def execute(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = ctx.host match {
-    case Localhost => executeLocal(cmd, verbose)
+    case Localhost => executeOnLocalhost(cmd, verbose)
     case remoteHost: Host => executeRemoteSsh(remoteHost, cmd, verbose)
   }
 }
