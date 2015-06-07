@@ -442,6 +442,21 @@ case class Download(hosts: Hosts, url: URL, destinationPath: String, usingSudo: 
   override def par: Download = this.copy(usingPar = true)
 }
 
+/**
+ * Execute POST request.
+ *
+ * @param hosts target hosts.
+ * @param path application path.
+ * @param data body of request.
+ * @param headers request headers.
+ * @param checkResponseFun check function for response body.
+ * @param checkStatusFun check function for response status code.
+ * @param port port of application.
+ * @param usingSudo true, if sudo needed.
+ * @param usingPar true, if parallel execution needed.
+ * @param exec path to curl executable.
+ * @param user user.
+ */
 case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[String] = Nil,
                        checkResponseFun: (String => Boolean) = _ => true,
                        checkStatusFun: (String => Boolean) = resp => resp.contains("200 OK"),
@@ -587,6 +602,16 @@ object PostRequest {
   }
 }
 
+/**
+ * Install a debian package.
+ *
+ * @param hosts target hosts.
+ * @param packFile path to debian package on target hosts.
+ * @param usingSudo true, if sudo needed.
+ * @param usingPar true, if parallel execution needed.
+ * @param exec path to dpkg executable.
+ * @param user user.
+ */
 case class InstallDeb(hosts: Hosts, packFile: String, usingSudo: Boolean = false,
                       usingPar: Boolean = false, exec: String = "/usr/bin/dpkg")(implicit user: User)
   extends GenericTask("dpkg", "install debian package", hosts, exec, List("-i", packFile),
@@ -596,6 +621,16 @@ case class InstallDeb(hosts: Hosts, packFile: String, usingSudo: Boolean = false
   override def par: InstallDeb = this.copy(usingPar = true)
 }
 
+/**
+ * Starts a service.
+ *
+ * @param hosts target hosts.
+ * @param service service name.
+ * @param usingSudo true, if sudo eeded.
+ * @param usingPar true, if parallel execution needed.
+ * @param exec path to init.d.
+ * @param user user.
+ */
 case class StartService(hosts: Hosts, service: String, usingSudo: Boolean = false,
                       usingPar: Boolean = false, exec: String = "/etc/init.d/")(implicit user: User)
   extends GenericTask("service", "start service", hosts, s"$exec$service", List("start"),
@@ -605,6 +640,16 @@ case class StartService(hosts: Hosts, service: String, usingSudo: Boolean = fals
   override def par: StartService = this.copy(usingPar = true)
 }
 
+/**
+ * Stops a service.
+ *
+ * @param hosts target hosts.
+ * @param service service name.
+ * @param usingSudo true, if sudo eeded.
+ * @param usingPar true, if parallel execution needed.
+ * @param exec path to init.d.
+ * @param user user.
+ */
 case class StopService(hosts: Hosts, service: String, usingSudo: Boolean = false,
                         usingPar: Boolean = false, exec: String = "/etc/init.d/")(implicit user: User)
   extends GenericTask("service", "stop service", hosts, s"$exec$service", List("stop"),
