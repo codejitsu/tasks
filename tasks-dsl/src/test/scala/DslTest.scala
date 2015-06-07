@@ -577,29 +577,29 @@ class DslTest extends FlatSpec with Matchers {
     lhs().res should be (rhs().res)
   }
 
-/*
   def deploymentTomcat(): Unit = {
     val hosts = "my.dev.test-host" ~ (1 to 5)
     val file = "/tmp/test.war"
 
+    val user = NoUser
+
     val deployOnTomcat = for {
-      _ <- RmIfExists(hosts)(user.home / "test.war")
-      _ <- Upload(hosts)(file)
-      _ <- StopTomcat(hosts, sudo = true)
-      _ <- Mv(hosts)(user.home / "test.war")("/tomcat/webapp/")
-      _ <- StartTomcat(hosts, sudo = true)
-      _ <- Delay(30 seconds)
-      deployed <- HealthCheck(hosts, 8080)("/webapp/health", 2 * 60 * 1000, 5)
+      _ <- RmIfExists(hosts, user.home / "test.war")
+      _ <- Upload(hosts, file, user.home)
+      _ <- Sudo ~ StopTomcat(hosts)
+      _ <- Mv(hosts, user.home / "test.war", "/tomcat/webapp/")
+      _ <- Sudo ~ StartTomcat(hosts)
+      _ <- Wait(30 seconds)
+      deployed <- CheckUrl(hosts, "/webapp/health")
     } yield deployed
 
     val deployOnTomcat2 =
-        RmIfExists(hosts)(user.home / "test.war") andThen
-        Upload(hosts)(file) andThen
-        StopTomcat(hosts, sudo = true) andThen
-        Mv(hosts)(user.home / "test.war")("/tomcat/webapp/") andThen
-        StartTomcat(hosts, sudo = true) andThen
-        Delay(30 seconds) andThen
-        HealthCheck(hosts, 8080)("/webapp/health", 2 * 60 * 1000, 5)
+        RmIfExists(hosts, user.home / "test.war") andThen
+        Upload(hosts, file, user.home) andThen
+        Sudo ~ StopTomcat(hosts) andThen
+        Mv(hosts, user.home / "test.war", "/tomcat/webapp/") andThen
+        Sudo ~ StartTomcat(hosts) andThen
+        Wait(30 seconds) andThen
+        CheckUrl(hosts, "/webapp/health")
   }
-  */
 }

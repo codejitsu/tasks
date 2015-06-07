@@ -174,6 +174,10 @@ object Tasks {
     }
   }
 
+  implicit class PathOps(ctx: String) {
+    def / (path: String): String = s"$ctx/$path"
+  }
+
   object Sudo {
     case class ParHandler() {
       def ~[T <: UsingSudo[T] with UsingParallelExecution[T]](task: T): T = task.sudo.par
