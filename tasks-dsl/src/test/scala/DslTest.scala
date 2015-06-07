@@ -2,7 +2,7 @@ package net.codejitsu.tasks.dsl
 
 import org.scalatest.{Matchers, FlatSpec}
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 /**
  * DSL tests.
@@ -485,6 +485,96 @@ class DslTest extends FlatSpec with Matchers {
     composedResult2.out should be (List("start test program with param: 1", "start test program with param: 2",
       "start test program with param: 3", "start test program with param: 4"))
     composedResult2.err should be (empty)
+  }
+
+  it should "have leftIdentity property" in {
+    def f(v: Boolean): TaskM[String] = if (v) {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
+      }
+    } else {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
+      }
+    }
+
+    val task = new TaskM[Boolean] {
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(false), List("a"), List("b"))
+    }
+
+    val lhs = task.flatMap(f)
+
+    val rhs = f(false)
+
+    lhs().res should be (rhs().res)
+  }
+
+  it should "have rightIdentity property" in {
+    def f(v: Boolean): TaskM[String] = if (v) {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
+      }
+    } else {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
+      }
+    }
+
+    def g(v: Boolean): TaskM[String] = if (v) {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("a"), Nil, Nil)
+      }
+    } else {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("b"), Nil, Nil)
+      }
+    }
+
+    val task = new TaskM[Boolean] {
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(false), List("a"), List("b"))
+    }
+
+    val lhs = task.flatMap {v =>
+      new TaskM[Boolean] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(v), List("a"), List("b"))
+      }
+    }
+
+    val rhs = task
+
+    lhs().res should be (rhs().res)
+  }
+
+  it should "have associativity property" in {
+    def f(v: String): TaskM[String] = if (v.isEmpty) {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
+      }
+    } else {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
+      }
+    }
+
+    def g(v: String): TaskM[String] = if (v.isEmpty) {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("a"), Nil, Nil)
+      }
+    } else {
+      new TaskM[String] {
+        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("b"), Nil, Nil)
+      }
+    }
+
+    val task = new TaskM[String] {
+      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success(""), List("a"), List("b"))
+    }
+
+    val lhs = task.flatMap(f).flatMap(g)
+
+    val rhs = task.flatMap(x => f(x).flatMap(g))
+
+    lhs().res should be (rhs().res)
   }
 
 /*

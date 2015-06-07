@@ -40,9 +40,9 @@ trait TaskM[+R] extends Description {
     }
   }
 
-  def flatMap[T >: R](f: R => TaskM[T]): TaskM[T] = new TaskM[T] {
+  def flatMap[T](f: R => TaskM[T]): TaskM[T] = new TaskM[T] {
     override def run(verbose: VerbosityLevel = NoOutput): TaskResult[T] = {
-      val selfRes = self.run(verbose)
+      val selfRes: TaskResult[R] = self.run(verbose)
 
       selfRes.res match {
         case Success(r) =>
@@ -50,7 +50,7 @@ trait TaskM[+R] extends Description {
 
           nextRes.copy(out = selfRes.out ++ nextRes.out, err = selfRes.err ++ nextRes.err)
 
-        case _ => selfRes
+        case Failure(e) => TaskResult[T](Failure(e), selfRes.out, selfRes.err)
       }
     }
   }
