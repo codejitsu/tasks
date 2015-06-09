@@ -2,11 +2,13 @@
 
 package net.codejitsu.tasks.dsl
 
-import java.io.File
+import java.io.{FileInputStream, File}
+import java.util.Properties
 
 import net.codejitsu.tasks.dsl.User.PasswordFunc
 
 import scala.io.StdIn
+import scala.util.Try
 
 sealed trait User {
   def username: String
@@ -36,4 +38,18 @@ object User {
   type PasswordFunc = () => Array[Char]
 
   implicit val DefaultUser: User = NoUser
+
+  def load: User = {
+    val sshT = Try {
+      val sshProp = new Properties()
+
+      sshProp.load(new FileInputStream(s"/home/${System.getProperty("user.name")}/.sbt-robot/ssh.properties"))
+
+      SshUserWithPassword(sshProp.getProperty("username").trim,
+        Option(new java.io.File(sshProp.getProperty("keyfile").trim)),
+        sshProp.getProperty("password").trim)
+    }
+
+    sshT.getOrElse(DefaultUser)
+  }
 }
