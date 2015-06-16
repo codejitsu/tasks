@@ -2,7 +2,7 @@
 
 package net.codejitsu.tasks.dsl
 
-import java.io.{FileInputStream, File}
+import java.io.{File, FileInputStream}
 import java.util.Properties
 
 import net.codejitsu.tasks.dsl.User.PasswordFunc

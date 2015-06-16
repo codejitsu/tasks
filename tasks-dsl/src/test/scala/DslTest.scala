@@ -8,8 +8,9 @@ import scala.util.Success
  * DSL tests.
  */
 class DslTest extends FlatSpec with Matchers {
-  import Tasks._
   import scala.concurrent.duration._
+  import net.codejitsu.tasks._
+  import net.codejitsu.tasks.dsl.Tasks._
 
   implicit val timeout = 30 seconds
 

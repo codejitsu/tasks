@@ -10,7 +10,8 @@ import org.scalatest.{Matchers, FlatSpec}
  */
 class TouchTest extends FlatSpec with Matchers {
   import scala.concurrent.duration._
-  import Tasks._
+  import net.codejitsu.tasks._
+  import net.codejitsu.tasks.dsl.Tasks._
 
   implicit val timeout = 30 seconds
 

@@ -2,9 +2,9 @@
 
 package net.codejitsu.tasks.dsl
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success}
 
 /**
  * DSL for tasks scripting.
