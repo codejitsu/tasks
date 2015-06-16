@@ -577,6 +577,32 @@ class DslTest extends FlatSpec with Matchers {
     lhs().res should be (rhs().res)
   }
 
+  it should "use orElse if previous step fails" in {
+    val startShellFailure = FailedTask(List(), List("task error"))
+
+    val composed = startShellFailure orElse EmptyTask
+
+    val composedResult = composed.run()
+
+    composedResult.res.isSuccess should be (true)
+  }
+
+  it should "use orElse to compose multiple failed tasks" in {
+    val startShellFailure = FailedTask(List(), List("task error"))
+
+    val composed = startShellFailure orElse
+                   startShellFailure orElse
+                   startShellFailure orElse
+                   startShellFailure orElse
+                   startShellFailure orElse
+                   startShellFailure orElse
+                   EmptyTask
+
+    val composedResult = composed.run()
+
+    composedResult.res.isSuccess should be (true)
+  }
+
   def deploymentTomcat(): Unit = {
     val hosts = "my.dev.test-host" ~ (1 to 5)
     val file = "/tmp/test.war"

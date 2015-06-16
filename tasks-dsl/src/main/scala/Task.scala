@@ -54,6 +54,17 @@ trait TaskM[+R] extends Description {
       }
     }
   }
+
+  def orElse[T >: R](task: TaskM[T]): TaskM[T] = new TaskM[T] {
+    override def run(verbose: VerbosityLevel = NoOutput): TaskResult[T] = {
+      val selfRes: TaskResult[T] = self.run(verbose)
+
+      selfRes.res match {
+        case Success(r) => selfRes
+        case _ => task.run(verbose)
+      }
+    }
+  }
 }
 
 object LoggedRun {

@@ -34,7 +34,7 @@ object Dependencies {
     val scalacheck    = "org.scalacheck"          %% "scalacheck"           % ScalaCheckVer     % "test"
     val junit         = "junit"                    % "junit"                % JunitVer          % "test"
 
-//    val abideExtra    = "com.typesafe"             % "abide-extra_2.11"     % AbideExtraVer     % "abide,test"
+    val abideExtra    = "com.typesafe"             % "abide-extra_2.11"     % AbideExtraVer     % "abide,test"
   }
 
   import Compile._
