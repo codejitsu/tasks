@@ -63,6 +63,8 @@ object Tasks {
     }
 
     def ~>(proc: PartialFunction[Command, CommandLine]): ProcessStep = Host(List(HostPart(ctx))) ~> proc
+
+    def h: Host = Host(List(HostPart(ctx)))
   }
 
   implicit class HostRangeOps[T](val ctx: IndexedSeq[T]) {

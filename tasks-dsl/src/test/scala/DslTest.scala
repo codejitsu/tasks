@@ -136,6 +136,19 @@ class DslTest extends FlatSpec with Matchers {
     all should be (List("host1my.test.host.system.1", "host2my.test.host.system.1", "host3my.test.host.system.1"))
   }
 
+  it should "allow to create single host from string with .h" in {
+    val host: Host = "my.test.host".h
+
+    host.toString() should be ("my.test.host")
+  }
+
+  it should "allow to convert single string to hosts" in {
+    val hosts: Hosts = "my.test.host".h
+
+    hosts.hosts.size should be (1)
+    hosts.hosts.head.toString() should be ("my.test.host")
+  }
+
   it should "allow to define process on host" in {
     val host = "my" ~ "test" ~ "host"
 
