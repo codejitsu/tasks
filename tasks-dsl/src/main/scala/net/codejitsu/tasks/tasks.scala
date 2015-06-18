@@ -355,7 +355,7 @@ case class Download(hosts: Hosts, url: URL, destinationPath: String, usingSudo: 
  */
 case class PostRequest(hosts: Hosts, path: String, data: String, headers: List[String] = Nil,
                        checkResponseFun: (String => Boolean) = _ => true,
-                       checkStatusFun: (String => Boolean) = resp => resp.contains("200 OK"),
+                       checkStatusFun: (String => Boolean) = _ => true,
                        port: Int = PostRequest.DefaultPort,
                        usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/usr/bin/curl")(implicit user: User)
   extends TaskM[Boolean] with UsingSudo[PostRequest] with UsingParallelExecution[PostRequest] {

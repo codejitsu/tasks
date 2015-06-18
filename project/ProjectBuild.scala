@@ -21,14 +21,6 @@ object ProjectBuild extends Build {
 object Dependencies {
   import Versions._
 
-  object Compile {
-    val config        = "com.typesafe"             % "config"               % TypesafeConfigVer
-    val ssh           = "com.decodified"          %% "scala-ssh"            % ScalaSshVer
-    val logback       = "ch.qos.logback"           % "logback-classic"      % LogbackVer
-    val bouncy        = "org.bouncycastle"         % "bcprov-jdk16"         % "1.46"
-    val jcraft        = "com.jcraft"               % "jzlib"                % "1.1.3"
-  }
-
   object Test {
     val scalatest     = "org.scalatest"           %% "scalatest"            % ScalaTestVer      % "test"
     val scalacheck    = "org.scalacheck"          %% "scalacheck"           % ScalaCheckVer     % "test"
@@ -37,11 +29,9 @@ object Dependencies {
     val abideExtra    = "com.typesafe"             % "abide-extra_2.11"     % AbideExtraVer     % "abide,test"
   }
 
-  import Compile._
-
   val test = Seq(Test.scalatest, Test.scalacheck, Test.junit)
 
   /** Module deps */
 
-  val tasksDsl = Seq(config, ssh, logback, bouncy, jcraft) ++ test
+  val tasksDsl = test
 }
