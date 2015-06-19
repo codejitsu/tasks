@@ -43,7 +43,7 @@ object User {
     val sshT = Try {
       val sshProp = new Properties()
 
-      sshProp.load(new FileInputStream(s"/home/${System.getProperty("user.name")}/.sbt-robot/ssh.properties"))
+      sshProp.load(new FileInputStream(s"/home/${System.getProperty("user.name")}/.ssh-tasks/ssh.properties"))
 
       SshUserWithPassword(sshProp.getProperty("username").trim,
         Option(new java.io.File(sshProp.getProperty("keyfile").trim)),
