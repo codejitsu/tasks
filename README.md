@@ -5,6 +5,8 @@ Tasks is a library for building executable (shell)-scripts functional way. It is
 
 Scripts can be executed locally on localhost or remote over ssh.
 
+My `sbt` plugin `sbt-robot` (https://github.com/codejitsu/sbt-robot) uses `tasks` to install custom sbt tasks.
+
 Usage
 -----
 
@@ -72,7 +74,7 @@ val taskWithSudo = Sudo ~ StopTomcat(...)
 Par
 ---
  
-If a task consists of multiple steps (for example checking the same url on several hosts) you can use the `Par`-transformer
+If a task consists of multiple independent steps (for example checking the same url on several hosts) you can use the `Par`-transformer
 in order to run all that steps in parallel:
   
 ```scala
@@ -104,7 +106,7 @@ val hostsWithPattern = "test-host" | (1 to 25) | ".my.net.com"
 // test-host1.my.net.com, test-host2.my.net.com, ..., test-host25.my.net.com
 ```
 
-You can use tuples and sequences too: 
+You can use tuples and sequences: 
 
 ```scala
 import net.codejitsu.tasks.dsl.Tasks._
@@ -113,7 +115,7 @@ val hostsWithPattern = "test-host" | ((1, 'z', "abc")) | ".my.net.com"
 // test-host1.my.net.com, test-hostz.my.net.com, test-hostabc.my.net.com
 ```
 
-You can concatenate path parts with `~`-operator:
+You can concatenate path parts with `~`-operator (all parts will be concatenated with `.`):
 
 ```scala
 import net.codejitsu.tasks.dsl.Tasks._
@@ -131,7 +133,7 @@ val myHost = "my.host.net".h
 Users
 -----
 
-For ssh-access you have to specify `ssh`-property file in `~/.ssh-tasks/ssh.properties`.
+For ssh-access you have to specify user credentials in a `ssh`-property file in `~/.ssh-tasks/ssh.properties`.
 
 This file contains the following data:
 
@@ -157,7 +159,7 @@ Example script
 
   val NotifyDeploymentFail = PostRequest(...)
 
-  val deployTomcats =
+  val deployApp =
       Par ~ RmIfExists(hosts, user.home / s"$artifact*") andThen
       Par ~ Upload(hosts, targetPath / artifact, user.home) andThen
       Sudo ~ Par ~ StopTomcat(hosts) andThen
