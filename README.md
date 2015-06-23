@@ -45,7 +45,7 @@ All tasks are composable with `andThan`-operator. The result is the new `Task`-o
       NotifyMessageOk
 ```
 
-You can define tasks using for comprehension:
+You can chain tasks with for comprehension:
 
 ```scala
   val deployTomcats = for {

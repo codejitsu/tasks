@@ -157,12 +157,10 @@ object Tasks {
           val resultSuccess = result.map(_.res.isSuccess).forall(identity)
 
           val resultOut = result.
-            filter(_.res.isSuccess).
             map(_.out).
             foldLeft(List.empty[String])((acc, out) => acc ++ out)
 
           val resultErr = result.
-            filter(_.res.isSuccess).
             map(_.err).
             foldLeft(List.empty[String])((acc, err) => acc ++ err)
 

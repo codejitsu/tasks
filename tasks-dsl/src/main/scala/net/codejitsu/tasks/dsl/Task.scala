@@ -225,23 +225,32 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     val commandLine = remoteCommandLine(user)
 
-    val proc = commandLine run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))
-    val result = proc.exitValue
+    if (commandLine.isEmpty) {
+      val noSsh = "No ssh credentials specified. Please provide a valid ssh username, ssh-key and password (see User.load)."
 
-    val statusMsg = if (result == 0) {
-      "ok"
-    } else {
-      "failed"
-    }
-
-    if (result == 0) {
-      printCommandLog(msg, Console.GREEN, statusMsg, commandLine, verbose)
-
-      TaskResult(Success(true), out.toList, err.toList)
-    } else {
-      printCommandLog(msg, Console.RED, statusMsg, commandLine, verbose)
+      err += noSsh
+      out += noSsh
 
       TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+    } else {
+      val proc = commandLine run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))
+      val result = proc.exitValue
+
+      val statusMsg = if (result == 0) {
+        "ok"
+      } else {
+        "failed"
+      }
+
+      if (result == 0) {
+        printCommandLog(msg, Console.GREEN, statusMsg, commandLine, verbose)
+
+        TaskResult(Success(true), out.toList, err.toList)
+      } else {
+        printCommandLog(msg, Console.RED, statusMsg, commandLine, verbose)
+
+        TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+      }
     }
   }
 
