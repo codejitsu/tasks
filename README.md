@@ -3,9 +3,10 @@ tasks
 
 Tasks is a library for building executable (shell)-scripts functional way. It is written in Scala.
 
-Scripts can be executed locally on localhost or remote over ssh.
+Scripts can be executed locally on localhost or remote over ssh (or in memory if you don't have any system tool calls).
 
-My `sbt` plugin `sbt-robot` (https://github.com/codejitsu/sbt-robot) uses `tasks` to install custom sbt tasks.
+My `sbt` plugin `sbt-robot` (https://github.com/codejitsu/sbt-robot) uses `tasks` to define and install custom sbt tasks 
+for projects built with `sbt` tool.
 
 Usage
 -----
@@ -31,10 +32,10 @@ There are some predefined tasks for Linux shell-commands like:
 
 You can define your custom tasks (see the `GenericTask` class).
 
-All tasks are composable with `andThan`-operator. The result is the new `Task`-object:
+All tasks are composable with `andThan`-operator. The result is a new `Task`:
 
 ```scala
-  val deployTomcats =
+  val deployApp =
       RmIfExists(...) andThen
       Upload(...) andThen
       StopTomcat(...) andThen
@@ -45,7 +46,7 @@ All tasks are composable with `andThan`-operator. The result is the new `Task`-o
       NotifyMessageOk
 ```
 
-You can chain tasks with for comprehension:
+You can chain tasks with for comprehension like:
 
 ```scala
   val deployTomcats = for {
@@ -62,6 +63,12 @@ You can chain tasks with for comprehension:
 
 To start a task, call the `run`-method. 
 
+Error handling
+--------------
+ 
+Functional tasks composition is also short circuit upon error - when an error occurs during a task 
+then the rest of the script logic isn't executed and the result is a type containing the first error encountered. 
+
 Sudo
 ----
  
@@ -74,30 +81,31 @@ val taskWithSudo = Sudo ~ StopTomcat(...)
 Par
 ---
  
-If a task consists of multiple independent steps (for example checking the same url on several hosts) you can use the `Par`-transformer
-in order to run all that steps in parallel:
+If a task consists of multiple independent steps (for example checking the same app monitoring url on several hosts) 
+you can use the `Par`-transformer in order to run all that steps in parallel:
   
 ```scala
 val taskWithSudoParallel = Sudo ~ Par ~ StopTomcat(...)
 ```
 
-Only if all steps succeeded the task result is also success, otherwise the task result is failure.  
+Only if all steps succeeded the task result is also `success`, otherwise the task result is `failure`.  
  
-OrElse
+orElse
 ------
 
-To make a simple if/else-decisions you can use the `orElse`-transformer:
+To make if/else-decisions use the `orElse`-operator:
  
 ```scala
-val taskStartTomcat = Sudo ~ Par ~ StartTomcat(...) orElse NotifyMessageError 
+val taskStartTomcat = Sudo ~ Par ~ StartTomcat(...) orElse NotifyMessageTomcatError 
 ``` 
 
-The `NotifyMessageError`-subtask will be called if the `StartTomcat` failed.
+The `NotifyMessageTomcatError`-subtask will be executed only if the `StartTomcat`-subtask failed.
 
 Hosts
 -----
 
-Tasks library provides a simple host definition DSL:
+Many tasks intended to run in parallel on several remote hosts (For example `Rm` task removes files on specified remote `Hosts`). 
+To simplify such tasks there is a nice `Hosts` DSL: 
 
 ```scala
 import net.codejitsu.tasks.dsl.Tasks._
@@ -133,7 +141,7 @@ val myHost = "my.host.net".h
 Users
 -----
 
-For ssh-access you have to specify user credentials in a `ssh`-property file in `~/.ssh-tasks/ssh.properties`.
+For `ssh`-access you have to specify user credentials in a `ssh`-properties file in `~/.ssh-tasks/ssh.properties`.
 
 This file contains the following data:
 
