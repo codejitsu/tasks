@@ -1,8 +1,8 @@
 // Copyright (C) 2015, codejitsu.
 
-package net.codejitsu.tasks
+package net.codejitsu.tasks.dsl
 
-import net.codejitsu.tasks.dsl.{Dev, Stage, TaskM}
+import net.codejitsu.tasks._
 
 import scala.annotation.implicitNotFound
 
