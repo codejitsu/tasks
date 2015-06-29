@@ -26,8 +26,10 @@ class Mv[S <: Stage](hosts: Hosts, source: String, destination: String, params: 
 }
 
 object Mv {
+  // scalastyle:off
   def apply[S <: Stage](hosts: Hosts, source: String, destination: String,
             params: List[String] = Nil, usingSudo: Boolean = false,
             usingPar: Boolean = false, exec: String = "/bin/mv")(implicit user: User, stage: S, rights: S Allow Mv[S]): Mv[S] =
     new Mv[S](hosts, source, destination, params, usingSudo, usingPar, exec)(user, stage, rights)
+  // scalastyle:on
 }

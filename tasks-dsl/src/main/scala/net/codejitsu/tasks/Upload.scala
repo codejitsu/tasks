@@ -15,8 +15,12 @@ import net.codejitsu.tasks.dsl._
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-case class Upload[S <: Stage](target: Hosts, source: String, destinationPath: String,
-                  usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User, stage: S, rights: S Allow Upload[S])
+case class Upload[S <: Stage](target: Hosts,
+                              source: String,
+                              destinationPath: String,
+                              usingSudo: Boolean = false,
+                              usingPar: Boolean = false,
+                              exec: String = "/usr/bin/rsync")(implicit user: User, stage: S, rights: S Allow Upload[S])
   extends TaskM[Boolean] with UsingSudo[Upload[S]] with UsingParallelExecution[Upload[S]] {
 
   private lazy val uploadProcs = target.hosts map {

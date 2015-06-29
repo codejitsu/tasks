@@ -26,9 +26,21 @@ class Cp[S <: Stage](hosts: Hosts, source: String, destination: String,
 }
 
 object Cp {
-  def apply[S <: Stage](hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
-            sudo: Boolean = false, parallel: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User, stage: S, rights: S Allow Cp[S]): Cp[S] =
+  // scalastyle:off
+  def apply[S <: Stage](hosts: Hosts,
+                        source: String,
+                        destination: String,
+                        params: List[String] = Nil,
+                        sudo: Boolean = false,
+                        parallel: Boolean = false,
+                        exec: String = "/usr/bin/rsync")(implicit user: User,
+                                                         stage: S, rights: S Allow Cp[S]): Cp[S] =
     new Cp[S](hosts, source, destination, params, sudo, parallel, exec)(user, stage, rights)
+  // scalastyle:on
 
-  def apply[S <: Stage](hosts: Hosts, source: String, destination: String)(implicit user: User, stage: S, rights: S Allow Cp[S]): Cp[S] = Cp[S](hosts, source, destination, Nil)
+  def apply[S <: Stage](hosts: Hosts,
+                        source: String,
+                        destination: String)(implicit user: User,
+                                             stage: S, rights: S Allow Cp[S]): Cp[S] = Cp[S](hosts, source, destination, Nil)
 }
+

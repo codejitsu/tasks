@@ -25,9 +25,11 @@ class Rm[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("
 }
 
 object Rm {
+  // scalastyle:off
   def apply[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("-r"), usingSudo: Boolean = false,
             usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User, stage: S, rights: S Allow Rm[S]): Rm[S] =
     new Rm[S](hosts, target, params, usingSudo, usingPar, exec)(user, stage, rights)
+  // scalastyle:on
 }
 
 /**
@@ -51,7 +53,9 @@ class RmIfExists[S <: Stage](hosts: Hosts, target: String, params: List[String] 
 }
 
 object RmIfExists {
+  // scalastyle:off
   def apply[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("-rf"), usingSudo: Boolean = false,
             usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User, stage: S, rights: S Allow RmIfExists[S]): RmIfExists[S] =
     new RmIfExists[S](hosts, target, params, usingSudo, usingPar, exec)(user, stage, rights)
+  // scalastyle:on
 }
