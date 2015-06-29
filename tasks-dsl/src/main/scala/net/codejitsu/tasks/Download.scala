@@ -4,7 +4,7 @@ package net.codejitsu.tasks
 
 import java.net.URL
 
-import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
+import net.codejitsu.tasks.dsl._
 
 /**
  * Download url.
@@ -16,11 +16,11 @@ import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
  * @param usingPar true, if parallel execution required.
  * @param user user.
  */
-case class Download(hosts: Hosts, url: URL, destinationPath: String, usingSudo: Boolean = false,
-                    usingPar: Boolean = false, exec: String = "/usr/bin/wget")(implicit user: User)
+case class Download[S <: Stage](hosts: Hosts, url: URL, destinationPath: String, usingSudo: Boolean = false,
+                    usingPar: Boolean = false, exec: String = "/usr/bin/wget")(implicit user: User, stage: S, rights: S Allow Download[S])
   extends GenericTask("wget", "download url", hosts, exec, List(url.toString, "-P", destinationPath),
-    usingSudo, usingPar, taskRepr = s"download url '${url.toString}'") with UsingSudo[Download] with UsingParallelExecution[Download] {
+    usingSudo, usingPar, taskRepr = s"download url '${url.toString}'") with UsingSudo[Download[S]] with UsingParallelExecution[Download[S]] {
 
-  override def sudo: Download = this.copy(usingSudo = true)
-  override def par: Download = this.copy(usingPar = true)
+  override def sudo: Download[S] = this.copy(usingSudo = true)
+  override def par: Download[S] = this.copy(usingPar = true)
 }

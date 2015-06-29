@@ -2,7 +2,7 @@
 
 package net.codejitsu.tasks
 
-import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
+import net.codejitsu.tasks.dsl._
 
 /**
  * Remove file / dir task.
@@ -14,20 +14,20 @@ import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-class Rm(hosts: Hosts, target: String, params: List[String] = List("-r"),
+class Rm[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("-r"),
          usingSudo: Boolean = false, usingPar: Boolean = false,
-         exec: String = "/bin/rm", desc: String = "remove file(s)")(implicit user: User)
+         exec: String = "/bin/rm", desc: String = "remove file(s)")(implicit user: User, stage: S, rights: S Allow Rm[S])
   extends GenericTask("rm", desc, hosts, exec, params ::: List(target),
-    usingSudo, usingPar, taskRepr = s"$desc '$target'") with UsingSudo[Rm] with UsingParallelExecution[Rm] {
+    usingSudo, usingPar, taskRepr = s"$desc '$target'") with UsingSudo[Rm[S]] with UsingParallelExecution[Rm[S]] {
 
-  override def sudo: Rm = Rm(hosts, target, params, true, usingPar, exec)
-  override def par: Rm = Rm(hosts, target, params, usingSudo, true, exec)
+  override def sudo: Rm[S] = Rm[S](hosts, target, params, true, usingPar, exec)
+  override def par: Rm[S] = Rm[S](hosts, target, params, usingSudo, true, exec)
 }
 
 object Rm {
-  def apply(hosts: Hosts, target: String, params: List[String] = List("-r"), usingSudo: Boolean = false,
-            usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User): Rm =
-    new Rm(hosts, target, params, usingSudo, usingPar, exec)(user)
+  def apply[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("-r"), usingSudo: Boolean = false,
+            usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User, stage: S, rights: S Allow Rm[S]): Rm[S] =
+    new Rm[S](hosts, target, params, usingSudo, usingPar, exec)(user, stage, rights)
 }
 
 /**
@@ -40,18 +40,18 @@ object Rm {
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-class RmIfExists(hosts: Hosts, target: String, params: List[String] = List("-rf"),
+class RmIfExists[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("-rf"),
                  usingSudo: Boolean = false, usingPar: Boolean = false,
-                 exec: String = "/bin/rm", desc: String = "remove file(s) (if exists)")(implicit user: User)
+                 exec: String = "/bin/rm", desc: String = "remove file(s) (if exists)")(implicit user: User, stage: S, rights: S Allow RmIfExists[S])
   extends GenericTask("rm", desc, hosts, exec, params ::: List(target),
-    usingSudo, usingPar, taskRepr = s"$desc '$target'") with UsingSudo[RmIfExists] with UsingParallelExecution[RmIfExists] {
+    usingSudo, usingPar, taskRepr = s"$desc '$target'") with UsingSudo[RmIfExists[S]] with UsingParallelExecution[RmIfExists[S]] {
 
-  override def sudo: RmIfExists = RmIfExists(hosts, target, params, true, usingPar, exec)
-  override def par: RmIfExists = RmIfExists(hosts, target, params, usingSudo, true, exec)
+  override def sudo: RmIfExists[S] = RmIfExists[S](hosts, target, params, true, usingPar, exec)
+  override def par: RmIfExists[S] = RmIfExists[S](hosts, target, params, usingSudo, true, exec)
 }
 
 object RmIfExists {
-  def apply(hosts: Hosts, target: String, params: List[String] = List("-rf"), usingSudo: Boolean = false,
-            usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User): RmIfExists =
-    new RmIfExists(hosts, target, params, usingSudo, usingPar, exec)(user)
+  def apply[S <: Stage](hosts: Hosts, target: String, params: List[String] = List("-rf"), usingSudo: Boolean = false,
+            usingPar: Boolean = false, exec: String = "/bin/rm")(implicit user: User, stage: S, rights: S Allow RmIfExists[S]): RmIfExists[S] =
+    new RmIfExists[S](hosts, target, params, usingSudo, usingPar, exec)(user, stage, rights)
 }

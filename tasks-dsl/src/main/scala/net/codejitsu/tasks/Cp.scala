@@ -2,7 +2,7 @@
 
 package net.codejitsu.tasks
 
-import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
+import net.codejitsu.tasks.dsl._
 
 /**
  * Copy file / dir task.
@@ -15,20 +15,20 @@ import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-class Cp(hosts: Hosts, source: String, destination: String,
+class Cp[S <: Stage](hosts: Hosts, source: String, destination: String,
          params: List[String] = Nil, usingSudo: Boolean = false,
-         usingPar: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User)
+         usingPar: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User, stage: S, rights: S Allow Cp[S])
   extends GenericTask("rsync", "copy file(s)", hosts, exec, params ::: List(source, destination),
-    usingSudo, usingPar, taskRepr = s"copy file(s) '${source}' -> '${destination}'") with UsingSudo[Cp] with UsingParallelExecution[Cp] {
+    usingSudo, usingPar, taskRepr = s"copy file(s) '${source}' -> '${destination}'") with UsingSudo[Cp[S]] with UsingParallelExecution[Cp[S]] {
 
-  override def sudo: Cp = Cp(hosts, source, destination, params, true, usingPar, exec)
-  override def par: Cp = Cp(hosts, source, destination, params, usingSudo, true, exec)
+  override def sudo: Cp[S] = Cp[S](hosts, source, destination, params, true, usingPar, exec)
+  override def par: Cp[S] = Cp[S](hosts, source, destination, params, usingSudo, true, exec)
 }
 
 object Cp {
-  def apply(hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
-            sudo: Boolean = false, parallel: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User): Cp =
-    new Cp(hosts, source, destination, params, sudo, parallel, exec)(user)
+  def apply[S <: Stage](hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
+            sudo: Boolean = false, parallel: Boolean = false, exec: String = "/usr/bin/rsync")(implicit user: User, stage: S, rights: S Allow Cp[S]): Cp[S] =
+    new Cp[S](hosts, source, destination, params, sudo, parallel, exec)(user, stage, rights)
 
-  def apply(hosts: Hosts, source: String, destination: String)(implicit user: User): Cp = Cp(hosts, source, destination, Nil)
+  def apply[S <: Stage](hosts: Hosts, source: String, destination: String)(implicit user: User, stage: S, rights: S Allow Cp[S]): Cp[S] = Cp[S](hosts, source, destination, Nil)
 }

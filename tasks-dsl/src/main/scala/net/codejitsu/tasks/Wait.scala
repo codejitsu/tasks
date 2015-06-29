@@ -16,7 +16,7 @@ import scala.util.{Success, Failure}
  *
  * @param d duration.
  */
-case class Wait(d: Duration) extends TaskM[Boolean] {
+case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S Allow Wait[S]) extends TaskM[Boolean] {
   override def description: String = "waiting"
 
   override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =

@@ -2,7 +2,7 @@
 
 package net.codejitsu.tasks
 
-import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
+import net.codejitsu.tasks.dsl._
 
 /**
  * Move file / dir task.
@@ -15,18 +15,19 @@ import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-class Mv(hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
-         usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/bin/mv")(implicit user: User)
+class Mv[S <: Stage](hosts: Hosts, source: String, destination: String, params: List[String] = Nil,
+         usingSudo: Boolean = false, usingPar: Boolean = false,
+         exec: String = "/bin/mv")(implicit user: User, stage: S, rights: S Allow Mv[S])
   extends GenericTask("mv", "move file(s)", hosts, exec, params ::: List(source, destination),
-    usingSudo, usingPar, taskRepr = s"move file(s) '${source}' -> '${destination}'") with UsingSudo[Mv] with UsingParallelExecution[Mv] {
+    usingSudo, usingPar, taskRepr = s"move file(s) '${source}' -> '${destination}'") with UsingSudo[Mv[S]] with UsingParallelExecution[Mv[S]] {
 
-  override def sudo: Mv = Mv(hosts, source, destination, params, true, usingPar, exec)
-  override def par: Mv = Mv(hosts, source, destination, params, usingSudo, true, exec)
+  override def sudo: Mv[S] = Mv[S](hosts, source, destination, params, true, usingPar, exec)
+  override def par: Mv[S] = Mv[S](hosts, source, destination, params, usingSudo, true, exec)
 }
 
 object Mv {
-  def apply(hosts: Hosts, source: String, destination: String,
+  def apply[S <: Stage](hosts: Hosts, source: String, destination: String,
             params: List[String] = Nil, usingSudo: Boolean = false,
-            usingPar: Boolean = false, exec: String = "/bin/mv")(implicit user: User): Mv =
-    new Mv(hosts, source, destination, params, usingSudo, usingPar, exec)(user)
+            usingPar: Boolean = false, exec: String = "/bin/mv")(implicit user: User, stage: S, rights: S Allow Mv[S]): Mv[S] =
+    new Mv[S](hosts, source, destination, params, usingSudo, usingPar, exec)(user, stage, rights)
 }

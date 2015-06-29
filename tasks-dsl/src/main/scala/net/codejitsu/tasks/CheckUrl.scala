@@ -16,9 +16,9 @@ import scala.util.{Failure, Success, Try}
  * @param checkFun predicate on response text.
  * @param usingPar true, if parallel execution required.
  */
-case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort,
-                    checkFun: (String => Boolean) = _ => true, usingPar: Boolean = false)
-  extends TaskM[Boolean] with UsingParallelExecution[CheckUrl] {
+case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort,
+                    checkFun: (String => Boolean) = _ => true, usingPar: Boolean = false)(implicit val stage: S, rights: S Allow CheckUrl[S])
+  extends TaskM[Boolean] with UsingParallelExecution[CheckUrl[S]] {
 
   private val tasks: collection.immutable.Seq[TaskM[Boolean]] = hosts.hosts.map { host =>
     new TaskM[Boolean] {
@@ -134,7 +134,7 @@ case class CheckUrl(hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort
     result
   }
 
-  override def par: CheckUrl = this.copy(usingPar = true)
+  override def par: CheckUrl[S] = this.copy(usingPar = true)
 }
 
 object CheckUrl {

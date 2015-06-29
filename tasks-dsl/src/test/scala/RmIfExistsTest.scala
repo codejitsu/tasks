@@ -13,6 +13,8 @@ class RmIfExistsTest extends FlatSpec with Matchers {
 
   implicit val timeout = 30 seconds
 
+  implicit val stage = new Dev {}
+
   "RmIfExists task" should "remove a file with given name on given host" in {
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
     val file2create = new File(path + "testfile.txt")

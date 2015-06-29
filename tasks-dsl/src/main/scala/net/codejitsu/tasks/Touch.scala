@@ -2,7 +2,7 @@
 
 package net.codejitsu.tasks
 
-import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
+import net.codejitsu.tasks.dsl._
 
 /**
  * Create file task.
@@ -13,12 +13,12 @@ import net.codejitsu.tasks.dsl.{UsingParallelExecution, UsingSudo, User, Hosts}
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-case class Touch(hosts: Hosts, target: String,
-                 usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/usr/bin/touch")(implicit user: User)
+case class Touch[S <: Stage](hosts: Hosts, target: String,
+                 usingSudo: Boolean = false, usingPar: Boolean = false, exec: String = "/usr/bin/touch")(implicit user: User, stage: S, rights: S Allow Touch[S])
   extends GenericTask("touch", "create file", hosts, exec, List(target),
-    usingSudo, usingPar, taskRepr = s"create file '$target'") with UsingSudo[Touch] with UsingParallelExecution[Touch] {
+    usingSudo, usingPar, taskRepr = s"create file '$target'") with UsingSudo[Touch[S]] with UsingParallelExecution[Touch[S]] {
 
-  override def sudo: Touch = this.copy(usingSudo = true)
-  override def par: Touch = this.copy(usingPar = true)
+  override def sudo: Touch[S] = this.copy(usingSudo = true)
+  override def par: Touch[S] = this.copy(usingPar = true)
 }
 

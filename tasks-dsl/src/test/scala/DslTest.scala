@@ -14,6 +14,8 @@ class DslTest extends FlatSpec with Matchers {
 
   implicit val timeout = 30 seconds
 
+  implicit val stage = new Dev {}
+
   "DSL" should "allow to compose two host parts together with ~" in {
     val host: Host = "my" ~ "test" ~ "host" ~ "system.1"
 
