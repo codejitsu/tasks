@@ -2,30 +2,9 @@
 
 package net.codejitsu.tasks
 
-import net.codejitsu.tasks.dsl.TaskM
+import net.codejitsu.tasks.dsl.{Dev, Stage, TaskM}
 
 import scala.annotation.implicitNotFound
-
-trait Stage {
-  def name: String
-  override def toString: String = name
-}
-
-trait Dev extends Stage {
-  override val name: String = "Development"
-}
-
-trait Test extends Stage {
-  override val name: String = "Test"
-}
-
-trait QA extends Stage {
-  override val name: String = "QA"
-}
-
-trait Production extends Stage {
-  override val name: String = "Production"
-}
 
 @implicitNotFound("Stage '${S}' is not allowed to run task '${T}'.")
 class Allow[S <: Stage, T <: TaskM[Boolean]]
