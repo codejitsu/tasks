@@ -151,7 +151,6 @@ This file contains the following data:
     keyfile = /home/alice/.ssh/key_rsa
     
 `User.load` will automatically read this file and create a user.    
- 
 
 Compile time access control
 --------------------------- 
