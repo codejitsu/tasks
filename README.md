@@ -186,7 +186,8 @@ Example script
   val hosts = "host-0" | (1 to 10) | ".my.hosting.net"
 
   implicit val user = User.load
-
+  implicit val stage = new Dev
+  
   val artifact = s"$name-$version.war"
   val webapps = "/tomcat7/webapps"
 
