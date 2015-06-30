@@ -152,6 +152,33 @@ This file contains the following data:
     
 `User.load` will automatically read this file and create a user.    
  
+
+Compile time access control
+--------------------------- 
+
+All scripts are designed to run on some defined `stage`. The following Stages are defined (you can define you own):
+
+* `Dev`
+* `Test`
+* `QA`
+* `Production`
+
+You have to provide a implicit stage for your scripts:
+ 
+```scala
+implicit val stage = new Dev
+```
+
+Each task can be explicitly allowed to run on some stage:  
+
+```scala
+implicit val stage = new Production
+
+implicit val allowStopTomcatInProd: Production Allow StopTomcat[Production] = new Allow[Production, StopTomcat[Production]]
+```
+
+All predefined tasks from `net.codejitsu.tasks` package allowed to run on `Dev` stage.
+ 
 Example script
 --------------
 
