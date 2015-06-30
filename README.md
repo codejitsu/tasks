@@ -169,6 +169,12 @@ You have to provide a implicit stage in your scripts:
 implicit val stage = new Dev
 ```
 
+If there is no explicit run permission for a task (or stage not defined), you get a compile time error like this:
+
+    Error:(22, 14) Stage is not allowed to run task 'TestTask[S]'.
+        TestTask().run()
+                 ^
+
 Each task can be explicitly allowed to run on some stage:  
 
 ```scala
