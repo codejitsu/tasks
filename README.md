@@ -156,14 +156,14 @@ This file contains the following data:
 Compile time access control
 --------------------------- 
 
-All scripts are designed to run on some defined `stage`. The following Stages are defined (you can define you own):
+All scripts are designed to run on some defined `stage`. The following stages are defined (you can define your own):
 
 * `Dev`
 * `Test`
 * `QA`
 * `Production`
 
-You have to provide a implicit stage for your scripts:
+You have to provide a implicit stage in your scripts:
  
 ```scala
 implicit val stage = new Dev
@@ -174,10 +174,11 @@ Each task can be explicitly allowed to run on some stage:
 ```scala
 implicit val stage = new Production
 
-implicit val allowStopTomcatInProd: Production Allow StopTomcat[Production] = new Allow[Production, StopTomcat[Production]]
+implicit val allowStopTomcatInProd: Production Allow StopTomcat[Production] = 
+    new Allow[Production, StopTomcat[Production]]
 ```
 
-All predefined tasks from `net.codejitsu.tasks` package allowed to run on `Dev` stage.
+All tasks from `net.codejitsu.tasks` package can be run on `Dev` stage per default.
  
 Example script
 --------------
