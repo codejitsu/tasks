@@ -22,13 +22,11 @@ object Settings extends Build {
   lazy val publishSettings = bintrayPublishSettings ++ Seq(
     bintrayOrganization in bintray := Some("codejitsu"),
     bintrayPackageLabels in bintray := Seq("scala", "continuous deployment", "continuous integration", "shell"),
-    publishMavenStyle := true
+    publishMavenStyle := true,
+    bintrayRepository in bintray := "maven"
   )
 
-  val parentSettings = buildSettings ++ publishSettings ++ Seq(
-    publishArtifact := false,
-    publish         := {}
-  )
+  val parentSettings = buildSettings ++ publishSettings
 
   val scalacSettings = Seq("-encoding", "UTF-8", s"-target:jvm-${Versions.JDKVer}", "-feature", "-language:_",
     "-deprecation", "-unchecked", "-Xfatal-warnings", "-Xlint")
