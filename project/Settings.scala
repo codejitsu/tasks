@@ -17,7 +17,11 @@ object Settings extends Build {
 
   override lazy val settings = super.settings ++ buildSettings
 
-  val parentSettings = buildSettings ++ Seq(
+  lazy val publishSettings = Seq(
+  
+  )
+
+  val parentSettings = buildSettings ++ publishSettings ++ Seq(
     publishArtifact := false,
     publish         := {}
   )
