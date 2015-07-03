@@ -18,8 +18,7 @@ class AllowTest extends FlatSpec with Matchers {
       extends GenericTask("test", "test", Localhost, "test", List(),
         false, false)
 
-    implicit val stage = new Dev {}
-
+    implicit val stage = new Dev
     assertTypeError("val res = TestTask1().run()")
   }
 
@@ -28,7 +27,7 @@ class AllowTest extends FlatSpec with Matchers {
       extends GenericTask("test", "test", Localhost, "test", List(),
         false, false)
 
-    implicit val stage = new Dev {}
+    implicit val stage = new Dev
     implicit val allowTestTask2: Dev Allow TestTask2[Dev] = new Allow[Dev, TestTask2[Dev]]
 
     TestTask2().run()
@@ -41,7 +40,7 @@ class AllowTest extends FlatSpec with Matchers {
       extends GenericTask("test", "test", Localhost, "test", List(),
         false, false)
 
-    implicit val stage = new Production {}
+    implicit val stage = new Production
     implicit val allowDevTestTask3: Dev Allow TestTask3[Dev] = null //null is the correct value
     assertTypeError("val res = TestTask3().run()")
   }

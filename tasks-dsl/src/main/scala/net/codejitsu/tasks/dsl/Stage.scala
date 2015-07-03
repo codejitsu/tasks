@@ -2,24 +2,24 @@
 
 package net.codejitsu.tasks.dsl
 
-trait Stage {
+abstract class Stage {
   def name: String
   override def toString: String = name
 }
 
-trait Dev extends Stage {
+final class Dev extends Stage {
   override val name: String = "Development"
 }
 
-trait Test extends Stage {
+final class Test extends Stage {
   override val name: String = "Test"
 }
 
-trait QA extends Stage {
+final class QA extends Stage {
   override val name: String = "QA"
 }
 
-trait Production extends Stage {
+final class Production extends Stage {
   override val name: String = "Production"
 }
 

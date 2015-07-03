@@ -14,7 +14,7 @@ class RmTest extends FlatSpec with Matchers {
 
   implicit val timeout = 30 seconds
 
-  implicit val stage = new Dev {}
+  implicit val stage = new Dev
 
   "Rm task" should "remove a file with given name on given host" in {
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"

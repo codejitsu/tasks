@@ -153,8 +153,8 @@ This file contains the following data:
 `User.load` will automatically read this file and create a user.    
 
 Compile time access control
---------------------------- 
-
+---------------------------
+ 
 All scripts are designed to run on some defined `stage`. The following stages are defined (you can define your own):
 
 * `Dev`

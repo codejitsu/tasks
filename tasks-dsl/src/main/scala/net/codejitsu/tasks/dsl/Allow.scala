@@ -6,7 +6,7 @@ import net.codejitsu.tasks._
 
 import scala.annotation.implicitNotFound
 
-@implicitNotFound("Stage '${S}' is not allowed to run task '${T}'.")
+@implicitNotFound("Stage is not allowed to run task '${T}'.")
 class Allow[S <: Stage, T <: TaskM[Boolean]]
 
 object Allow {

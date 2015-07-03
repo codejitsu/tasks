@@ -14,7 +14,7 @@ class CpTest extends FlatSpec with Matchers {
 
   implicit val timeout = 30 seconds
 
-  implicit val stage = new Dev {}
+  implicit val stage = new Dev
 
   "Cp task" should "copy a file with given name on given host" in {
     val path = getClass.getResource("/program-param.sh").getPath.split("/").init.mkString("/") + "/"
