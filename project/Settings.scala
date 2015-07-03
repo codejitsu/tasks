@@ -23,7 +23,10 @@ object Settings extends Build {
     bintrayOrganization in bintray := Some("codejitsu"),
     bintrayPackageLabels in bintray := Seq("scala", "continuous deployment", "continuous integration", "shell"),
     publishMavenStyle := true,
-    bintrayRepository in bintray := "maven"
+    bintrayRepository in bintray := "maven",
+    publishTo := {
+      publishTo.value /* Value set by bintray-sbt plugin */
+    }
   )
 
   val parentSettings = buildSettings ++ publishSettings
@@ -44,7 +47,7 @@ object Settings extends Build {
     parallelExecution   in ThisBuild  := false,
     parallelExecution   in Global     := false,
     ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-  ) ++ parentSettings
+  )
 
   val tests = inConfig(Test)(Defaults.testTasks) ++ inConfig(IntegrationTest)(Defaults.itSettings)
 
