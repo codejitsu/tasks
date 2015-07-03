@@ -4,6 +4,8 @@ import org.scalastyle.sbt.ScalastylePlugin
 import sbt._
 import sbt.Keys._
 import scala.language.postfixOps
+import bintray.BintrayPlugin._
+import bintray.BintrayKeys._
 
 object Settings extends Build {
   lazy val buildSettings = Seq(
@@ -17,8 +19,10 @@ object Settings extends Build {
 
   override lazy val settings = super.settings ++ buildSettings
 
-  lazy val publishSettings = Seq(
-  
+  lazy val publishSettings = bintrayPublishSettings ++ Seq(
+    bintrayOrganization in bintray := Some("codejitsu"),
+    bintrayPackageLabels in bintray := Seq("scala", "continuous deployment", "continuous integration", "shell"),
+    publishMavenStyle := true
   )
 
   val parentSettings = buildSettings ++ publishSettings ++ Seq(
