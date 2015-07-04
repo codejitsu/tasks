@@ -30,7 +30,9 @@ object Settings extends Build {
     }
   )
 
-  val parentSettings = buildSettings ++ publishSettings
+  val parentSettings = buildSettings ++ publishSettings ++ Seq(
+    publishArtifact := false
+  )
 
   val scalacSettings = Seq("-encoding", "UTF-8", s"-target:jvm-${Versions.JDKVer}", "-feature", "-language:_",
     "-deprecation", "-unchecked", "-Xfatal-warnings", "-Xlint")
