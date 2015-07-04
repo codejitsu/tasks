@@ -8,6 +8,15 @@ Scripts can be executed locally on localhost or remote over ssh (or in memory if
 My `sbt` plugin `sbt-robot` (https://github.com/codejitsu/sbt-robot) uses `tasks` to define and install custom sbt tasks 
 for projects built with `sbt` tool.
 
+Install
+-------
+
+    resolvers += "codejitsu at bintray" at "http://dl.bintray.com/codejitsu/maven"
+    
+    libraryDependencies ++= Seq(
+      "net.codejitsu" % "tasks-dsl_2.11" % "0.0.1"
+    )
+
 Usage
 -----
 
