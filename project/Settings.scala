@@ -24,6 +24,7 @@ object Settings extends Build {
     bintrayPackageLabels in bintray := Seq("scala", "continuous deployment", "continuous integration", "shell"),
     publishMavenStyle := true,
     bintrayRepository in bintray := "maven",
+    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
     publishTo := {
       publishTo.value /* Value set by bintray-sbt plugin */
     }
