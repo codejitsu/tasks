@@ -50,7 +50,7 @@ object Settings extends Build {
     parallelExecution   in ThisBuild  := false,
     parallelExecution   in Global     := false,
     ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-  )
+  ) ++ publishSettings
 
   val tests = inConfig(Test)(Defaults.testTasks) ++ inConfig(IntegrationTest)(Defaults.itSettings)
 
