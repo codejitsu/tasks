@@ -139,7 +139,7 @@ case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: String, hea
         }
       }
     } else {
-      tasks.foldLeft[TaskM[Boolean]](EmptyTask)((acc, t) => acc flatMap(_ => t))
+      tasks.foldLeft[TaskM[Boolean]](SuccessfulTask)((acc, t) => acc flatMap(_ => t))
     }
 
     val result = tasksFold.run(verbose)
@@ -300,7 +300,7 @@ case class GetRequest[S <: Stage](hosts: Hosts, path: String,
         }
       }
     } else {
-      tasks.foldLeft[TaskM[Boolean]](EmptyTask)((acc, t) => acc flatMap(_ => t))
+      tasks.foldLeft[TaskM[Boolean]](SuccessfulTask)((acc, t) => acc flatMap(_ => t))
     }
 
     val result = tasksFold.run(verbose)

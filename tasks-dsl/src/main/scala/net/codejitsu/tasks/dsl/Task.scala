@@ -114,7 +114,7 @@ case class FailedTask(out: List[String], err: List[String]) extends TaskM[Boolea
   override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Failure(new TaskExecutionError(Nil)), Nil, Nil)
 }
 
-case object EmptyTask extends TaskM[Boolean] {
+case object SuccessfulTask extends TaskM[Boolean] {
   override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(true), Nil, Nil)
 }
 

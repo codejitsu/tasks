@@ -138,7 +138,7 @@ object Tasks {
     def ! (op: Command)(implicit user: User): TaskM[Boolean] = {
       val tasks = ctx.procs.map(_ ! op)
 
-      tasks.foldLeft[TaskM[Boolean]](EmptyTask)((acc, t) => acc flatMap(_ => t))
+      tasks.foldLeft[TaskM[Boolean]](SuccessfulTask)((acc, t) => acc flatMap(_ => t))
     }
 
     def !! (op: Command)(implicit user: User, timeout: Duration): TaskM[Boolean] = {

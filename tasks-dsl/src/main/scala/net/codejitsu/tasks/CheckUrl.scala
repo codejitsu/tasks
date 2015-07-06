@@ -121,7 +121,7 @@ case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl
         }
       }
     } else {
-      tasks.foldLeft[TaskM[Boolean]](EmptyTask)((acc, t) => acc flatMap(_ => t))
+      tasks.foldLeft[TaskM[Boolean]](SuccessfulTask)((acc, t) => acc flatMap(_ => t))
     }
 
     val result = tasksFold.run(verbose)

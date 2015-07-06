@@ -596,7 +596,7 @@ class DslTest extends FlatSpec with Matchers {
   it should "use orElse if previous step fails" in {
     val startShellFailure = FailedTask(List(), List("task error"))
 
-    val composed = startShellFailure orElse EmptyTask
+    val composed = startShellFailure orElse SuccessfulTask
 
     val composedResult = composed.run()
 
@@ -612,7 +612,7 @@ class DslTest extends FlatSpec with Matchers {
                    startShellFailure orElse
                    startShellFailure orElse
                    startShellFailure orElse
-                   EmptyTask
+                   SuccessfulTask
 
     val composedResult = composed.run()
 
