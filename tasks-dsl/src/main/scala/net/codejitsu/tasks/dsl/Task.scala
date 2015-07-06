@@ -13,11 +13,11 @@ trait Description {
   def description: String = ""
 }
 
-trait UsingSudo[T <: UsingSudo[T]] {
+trait UsingSudo[T <: UsingSudo[T]] { this: T =>
   def sudo: T
 }
 
-trait UsingParallelExecution[T <: UsingParallelExecution[T]] {
+trait UsingParallelExecution[T <: UsingParallelExecution[T]] { this: T =>
   import scala.concurrent.duration._
   implicit val timeout = 90 seconds
 
