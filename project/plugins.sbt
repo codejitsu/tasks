@@ -8,4 +8,6 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.0")
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
+addSbtPlugin("org.brianmckenna" % "sbt-wartremover" % "0.13")
+
 resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"

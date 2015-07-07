@@ -3,6 +3,4 @@ object Versions {
   val JDKVer            = "1.7"
 
   val ScalaTestVer      = "2.1.7"
-
-  val WartremoverVer    = "0.10"
 }

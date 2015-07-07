@@ -1,8 +1,8 @@
 import de.johoop.jacoco4sbt.JacocoPlugin.jacoco
 import de.johoop.jacoco4sbt.Thresholds
-import org.scalastyle.sbt.ScalastylePlugin
 import sbt._
 import sbt.Keys._
+import wartremover._
 import scala.language.postfixOps
 import bintray.BintrayPlugin._
 import bintray.BintrayKeys._
@@ -14,7 +14,9 @@ object Settings extends Build {
     organization          := "net.codejitsu",
     organizationHomepage  := Some(url("http://www.codejitsu.net")),
     scalaVersion          := Versions.ScalaVer,
-    homepage              := Some(url("http://www.github.com/codejitsu/tasks"))
+    homepage              := Some(url("http://www.github.com/codejitsu/tasks")),
+
+    crossScalaVersions    := Seq("2.11.6", "2.10.4")
   )
 
   override lazy val settings = super.settings ++ buildSettings
@@ -42,15 +44,13 @@ object Settings extends Build {
 
   lazy val defaultSettings = testSettings ++ Seq(
     autoCompilerPlugins := true,
-    //libraryDependencies <+= scalaVersion { v => compilerPlugin("org.brianmckenna" %% "wartremover" % Versions.WartremoverVer) },
     scalacOptions       ++= scalacSettings,
-    //scalacOptions       += "-P:wartremover:traverser:org.brianmckenna.wartremover.warts.Unsafe",
     javacOptions        in Compile    ++= javacSettings,
     ivyLoggingLevel     in ThisBuild  := UpdateLogging.Quiet,
     parallelExecution   in ThisBuild  := false,
     parallelExecution   in Global     := false,
     ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-  ) ++ publishSettings
+  ) ++ publishSettings// ++ Seq(wartremoverWarnings in (Compile, compile) ++= Warts.unsafe.filter(_ != Wart.DefaultArguments))
 
   val tests = inConfig(Test)(Defaults.testTasks) ++ inConfig(IntegrationTest)(Defaults.itSettings)
 
