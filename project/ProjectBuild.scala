@@ -21,15 +21,13 @@ object ProjectBuild extends Build {
 object Dependencies {
   import Versions._
 
-  object Test {
-    val scalatest     = "org.scalatest"           %% "scalatest"            % ScalaTestVer      % "test"
-    val scalacheck    = "org.scalacheck"          %% "scalacheck"           % ScalaCheckVer     % "test"
-    val junit         = "junit"                    % "junit"                % JunitVer          % "test"
-
-    val abideExtra    = "com.typesafe"             % "abide-extra_2.11"     % AbideExtraVer     % "abide,test"
+  object TestDep {
+    val scalatest     = "org.scalatest"  %% "scalatest" % ScalaTestVer % Test
   }
 
-  val test = Seq(Test.scalatest, Test.scalacheck, Test.junit)
+  import TestDep._
+
+  val test = Seq(scalatest)
 
   /** Module deps */
 
