@@ -15,7 +15,7 @@ import net.codejitsu.tasks.dsl._
  * @param usingPar true, if parallel execution required.
  * @param user user
  */
-case class Upload[S <: Stage](target: Hosts,
+final case class Upload[S <: Stage](target: Hosts,
                               source: String,
                               destinationPath: String,
                               usingSudo: Boolean = false,
@@ -54,7 +54,7 @@ case class Upload[S <: Stage](target: Hosts,
       uploadTask
     )(verbose)
 
-  override def sudo: Upload[S] = this.copy(usingSudo = true)
+  override def sudo: Upload[S] = copy[S](usingSudo = true)
 
-  override def par: Upload[S] = this.copy(usingPar = true)
+  override def par: Upload[S] = copy[S](usingPar = true)
 }

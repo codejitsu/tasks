@@ -7,7 +7,7 @@ import scala.util.{Failure, Success, Try}
 
 class TaskExecutionError(err: List[String]) extends Exception(err.mkString)
 
-case class TaskResult[+R](res: Try[R], out: List[String], err: List[String])
+final case class TaskResult[+R](res: Try[R], out: List[String], err: List[String])
 
 trait Description {
   def description: String = ""
@@ -36,7 +36,7 @@ trait TaskM[+R] extends Description {
   def map[U](f: R => U): TaskM[U] = new TaskM[U] {
     override def run(verbose: VerbosityLevel = NoOutput): TaskResult[U] = {
       val selfRes = self.run(verbose)
-      selfRes.copy(res = selfRes.res.map(f))
+      selfRes.copy[U](res = selfRes.res.map(f))
     }
   }
 
@@ -48,9 +48,9 @@ trait TaskM[+R] extends Description {
         case Success(r) =>
           val nextRes = f(r).run(verbose)
 
-          nextRes.copy(out = selfRes.out ++ nextRes.out, err = selfRes.err ++ nextRes.err)
+          nextRes.copy[T](out = selfRes.out ++ nextRes.out, err = selfRes.err ++ nextRes.err)
 
-        case Failure(e) => TaskResult[T](Failure(e), selfRes.out, selfRes.err)
+        case Failure(e) => TaskResult[T](Failure[T](e), selfRes.out, selfRes.err)
       }
     }
   }
@@ -110,11 +110,11 @@ object LoggedRun {
   }
 }
 
-case class FailedTask(out: List[String], err: List[String]) extends TaskM[Boolean] {
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Failure(new TaskExecutionError(Nil)), Nil, Nil)
+final case class FailedTask(out: List[String], err: List[String]) extends TaskM[Boolean] {
+  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Failure[Boolean](new TaskExecutionError(Nil)), Nil, Nil)
 }
 
-case object SuccessfulTask extends TaskM[Boolean] {
+final case object SuccessfulTask extends TaskM[Boolean] {
   override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(true), Nil, Nil)
 }
 
@@ -185,7 +185,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
         case _ =>
       }
 
-      TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+      TaskResult(Failure[Boolean](new TaskExecutionError(err.toList)), out.toList, err.toList)
     }
   }
 
@@ -231,7 +231,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
       err += noSsh
       out += noSsh
 
-      TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+      TaskResult(Failure[Boolean](new TaskExecutionError(err.toList)), out.toList, err.toList)
     } else {
       val proc = commandLine run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))
       val result = proc.exitValue
@@ -249,7 +249,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
       } else {
         printCommandLog(msg, Console.RED, statusMsg, commandLine, verbose)
 
-        TaskResult(Failure(new TaskExecutionError(err.toList)), out.toList, err.toList)
+        TaskResult(Failure[Boolean](new TaskExecutionError(err.toList)), out.toList, err.toList)
       }
     }
   }

@@ -7,7 +7,7 @@ import scala.collection.immutable.IndexedSeq
 /**
  * Host.
  */
-case class Host(parts: collection.immutable.Seq[HostPart]) {
+class Host(val parts: collection.immutable.Seq[HostPart]) {
   override def toString(): String = parts.map(_.toString).mkString(".")
 
   def ~ (part: String): Host = Host(parts :+ HostPart(part))
@@ -29,6 +29,10 @@ case class Host(parts: collection.immutable.Seq[HostPart]) {
   }
 
   def isValid: Boolean = parts.forall(_.isValid)
+}
+
+object Host {
+  def apply(parts: collection.immutable.Seq[HostPart]): Host = new Host(parts)
 }
 
 object Localhost extends Host(List(HostPart("localhost"))) {

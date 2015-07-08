@@ -5,7 +5,7 @@ package net.codejitsu.tasks.dsl
 /**
  * Group of hosts.
  */
-case class Hosts(hosts: collection.immutable.Seq[Host]) {
+final case class Hosts(hosts: collection.immutable.Seq[Host]) {
   def ~ (part: String): Hosts = {
     val appended = hosts.map(h => Host(h.parts :+ HostPart(part)))
 

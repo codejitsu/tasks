@@ -16,7 +16,7 @@ import scala.util.{Success, Failure}
  *
  * @param d duration.
  */
-case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S Allow Wait[S]) extends TaskM[Boolean] {
+final case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S Allow Wait[S]) extends TaskM[Boolean] {
   override def description: String = "waiting"
 
   override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
@@ -32,10 +32,10 @@ case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S Allow 
 
           val result = try {
             Await.ready(promise.future, d)
-            TaskResult[Boolean](Failure(new TaskExecutionError(Nil)), Nil, Nil)
+            TaskResult[Boolean](Failure[Boolean](new TaskExecutionError(Nil)), Nil, Nil)
           } catch {
             case t: TimeoutException => TaskResult[Boolean](Success(true), Nil, Nil)
-            case e: Throwable => TaskResult[Boolean](Failure(new TaskExecutionError(List(e.getMessage))), Nil, Nil)
+            case e: Throwable => TaskResult[Boolean](Failure[Boolean](new TaskExecutionError(List(e.getMessage))), Nil, Nil)
           }
 
           result

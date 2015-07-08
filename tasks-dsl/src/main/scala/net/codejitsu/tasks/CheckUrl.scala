@@ -16,7 +16,7 @@ import scala.util.{Failure, Success, Try}
  * @param checkFun predicate on response text.
  * @param usingPar true, if parallel execution required.
  */
-case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort,
+final case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl.DefaultPort,
                     checkFun: (String => Boolean) = _ => true, usingPar: Boolean = false)(implicit val stage: S, rights: S Allow CheckUrl[S])
   extends TaskM[Boolean] with UsingParallelExecution[CheckUrl[S]] {
 
@@ -58,7 +58,7 @@ case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl
           TaskResult(Success(true), Nil, Nil)
         } else {
           printCommandLog(msg, Console.RED, "failed", verbose)
-          TaskResult(Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
+          TaskResult(Failure[Boolean](new TaskExecutionError(List("Check function failed."))), Nil, Nil)
         }
       }
     }
@@ -116,7 +116,7 @@ case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl
           if (resultSuccess) {
             TaskResult(Success(true), resultOut, resultErr)
           } else {
-            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure[Boolean](new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }
@@ -134,7 +134,7 @@ case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = CheckUrl
     result
   }
 
-  override def par: CheckUrl[S] = this.copy(usingPar = true)
+  override def par: CheckUrl[S] = copy[S](usingPar = true)
 }
 
 object CheckUrl {

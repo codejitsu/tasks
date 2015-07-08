@@ -50,7 +50,7 @@ object Settings extends Build {
     parallelExecution   in ThisBuild  := false,
     parallelExecution   in Global     := false,
     ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
-    wartremoverWarnings in (Compile, compile) ++= Warts.allBut(Wart.NoNeedForMonad, Wart.Any,
+    wartremoverWarnings in (Compile, compile) ++= Warts.allBut(Wart.NoNeedForMonad,
       Wart.Throw, Wart.DefaultArguments, Wart.NonUnitStatements)
   ) ++ publishSettings
 

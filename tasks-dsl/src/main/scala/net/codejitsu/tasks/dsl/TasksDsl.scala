@@ -92,7 +92,7 @@ object Tasks {
     }
   }
 
-  implicit class HostProductOps(val ctx: Product) {
+  implicit class HostProductOps[P <: Product](val ctx: P) {
     def ~ (part: String): Hosts = {
       val vals = for {
         i <- 0 until ctx.productArity
@@ -167,7 +167,7 @@ object Tasks {
           if (resultSuccess) {
             TaskResult(Success(true), resultOut, resultErr)
           } else {
-            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure[Boolean](new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }
@@ -179,7 +179,7 @@ object Tasks {
   }
 
   object Sudo {
-    case class ParHandler() {
+    final case class ParHandler() {
       def ~[T <: UsingSudo[T] with UsingParallelExecution[T]](task: T): T = task.sudo.par
     }
 
@@ -189,7 +189,7 @@ object Tasks {
   }
 
   object Par {
-    case class SudoHandler() {
+    final case class SudoHandler() {
       def ~[T <: UsingSudo[T] with UsingParallelExecution[T]](task: T): T = task.par.sudo
     }
 

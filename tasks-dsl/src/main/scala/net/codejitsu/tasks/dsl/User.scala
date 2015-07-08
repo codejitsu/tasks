@@ -26,11 +26,11 @@ case object NoUser extends User {
   override def password: PasswordFunc = () => Array.empty[Char]
 }
 
-case class SshUser(username: String, keyFile: Option[File]) extends User with SshCredentials {
+final case class SshUser(username: String, keyFile: Option[File]) extends User with SshCredentials {
   lazy val password: PasswordFunc = () => StdIn.readLine("Please enter your passphrase:").toCharArray
 }
 
-case class SshUserWithPassword(username: String, keyFile: Option[File], pwd: String) extends User with SshCredentials {
+final case class SshUserWithPassword(username: String, keyFile: Option[File], pwd: String) extends User with SshCredentials {
   lazy val password: PasswordFunc = () => pwd.toCharArray
 }
 

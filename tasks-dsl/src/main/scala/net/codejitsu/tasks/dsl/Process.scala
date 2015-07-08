@@ -20,11 +20,11 @@ sealed trait CommandLine {
   def cmd: String = s"$path ${args.mkString(" ")}"
 }
 
-case class Exec(path: String, params: String*) extends CommandLine {
+final case class Exec(path: String, params: String*) extends CommandLine {
   def args: Array[String] = params.toArray
 }
 
-case class SudoExec(path: String, params: String*) extends CommandLine {
+final case class SudoExec(path: String, params: String*) extends CommandLine {
   def args: Array[String] = params.toArray
   override def cmd: String = s"sudo -S ${super.cmd}"
 }
@@ -34,7 +34,7 @@ case object NoExec extends CommandLine {
   override val args: Array[String] = Array.empty[String]
 }
 
-case class Process(name: String, host: Host, proc: PartialFunction[Command, CommandLine]) {
+final case class Process(name: String, host: Host, proc: PartialFunction[Command, CommandLine]) {
   def startCmd: CommandLine = {
     if (proc.isDefinedAt(Start)) {
       proc(Start)
@@ -52,8 +52,8 @@ case class Process(name: String, host: Host, proc: PartialFunction[Command, Comm
   }
 }
 
-case class ProcessStep(proc: PartialFunction[Command, CommandLine], host: Host)
+final case class ProcessStep(proc: PartialFunction[Command, CommandLine], host: Host)
 
-case class ProcessSteps(steps: collection.immutable.Seq[ProcessStep])
+final case class ProcessSteps(steps: collection.immutable.Seq[ProcessStep])
 
-case class Processes(procs: collection.immutable.Seq[Process])
+final case class Processes(procs: collection.immutable.Seq[Process])
