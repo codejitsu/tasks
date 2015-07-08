@@ -49,8 +49,10 @@ object Settings extends Build {
     ivyLoggingLevel     in ThisBuild  := UpdateLogging.Quiet,
     parallelExecution   in ThisBuild  := false,
     parallelExecution   in Global     := false,
-    ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-  ) ++ publishSettings// ++ Seq(wartremoverWarnings in (Compile, compile) ++= Warts.unsafe.filter(_ != Wart.DefaultArguments))
+    ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
+    wartremoverWarnings in (Compile, compile) ++= Warts.allBut(Wart.NoNeedForMonad, Wart.Any,
+      Wart.Throw, Wart.DefaultArguments, Wart.NonUnitStatements)
+  ) ++ publishSettings
 
   val tests = inConfig(Test)(Defaults.testTasks) ++ inConfig(IntegrationTest)(Defaults.itSettings)
 

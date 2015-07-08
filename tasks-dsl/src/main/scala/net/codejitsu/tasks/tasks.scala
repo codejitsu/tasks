@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
  * @param exec path to curl executable.
  * @param user user.
  */
-case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: String, headers: List[String] = Nil,
+final case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: String, headers: List[String] = Nil,
                        checkResponseFun: (String => Boolean) = _ => true,
                        checkStatusFun: (String => Boolean) = _ => true,
                        port: Int = PostRequest.DefaultPort,
@@ -76,7 +76,7 @@ case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: String, hea
           TaskResult(Success(true), Nil, Nil)
         } else {
           printCommandLog(msg, Console.RED, "failed", verbose)
-          TaskResult(Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
+          TaskResult(Failure[Boolean](new TaskExecutionError(List("Check function failed."))), Nil, Nil)
         }
       }
     }
@@ -134,7 +134,7 @@ case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: String, hea
           if (resultSuccess) {
             TaskResult(Success(true), resultOut, resultErr)
           } else {
-            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure[Boolean](new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }
@@ -152,8 +152,8 @@ case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: String, hea
     result
   }
 
-  override def sudo: PostRequest[S] = this.copy(usingSudo = true)
-  override def par: PostRequest[S] = this.copy(usingPar = true)
+  override def sudo: PostRequest[S] = copy[S](usingSudo = true)
+  override def par: PostRequest[S] = copy[S](usingPar = true)
 }
 
 object PostRequest {
@@ -184,7 +184,7 @@ object PostRequest {
  * @param exec path to curl executable.
  * @param user user.
  */
-case class GetRequest[S <: Stage](hosts: Hosts, path: String,
+final case class GetRequest[S <: Stage](hosts: Hosts, path: String,
                       checkResponseFun: (String => Boolean) = _ => true,
                       checkStatusFun: (String => Boolean) = _ => true,
                       port: Int = GetRequest.DefaultPort,
@@ -237,7 +237,7 @@ case class GetRequest[S <: Stage](hosts: Hosts, path: String,
           TaskResult(Success(true), Nil, Nil)
         } else {
           printCommandLog(msg, Console.RED, "failed", verbose)
-          TaskResult(Failure(new TaskExecutionError(List("Check function failed."))), Nil, Nil)
+          TaskResult(Failure[Boolean](new TaskExecutionError(List("Check function failed."))), Nil, Nil)
         }
       }
     }
@@ -295,7 +295,7 @@ case class GetRequest[S <: Stage](hosts: Hosts, path: String,
           if (resultSuccess) {
             TaskResult(Success(true), resultOut, resultErr)
           } else {
-            TaskResult(Failure(new TaskExecutionError(resultErr)), resultOut, resultErr)
+            TaskResult(Failure[Boolean](new TaskExecutionError(resultErr)), resultOut, resultErr)
           }
         }
       }
@@ -313,8 +313,8 @@ case class GetRequest[S <: Stage](hosts: Hosts, path: String,
     result
   }
 
-  override def sudo: GetRequest[S] = this.copy(usingSudo = true)
-  override def par: GetRequest[S] = this.copy(usingPar = true)
+  override def sudo: GetRequest[S] = copy[S](usingSudo = true)
+  override def par: GetRequest[S] = copy[S](usingPar = true)
 }
 
 object GetRequest {
@@ -334,14 +334,14 @@ object GetRequest {
  * @param exec path to dpkg executable.
  * @param user user.
  */
-case class InstallDeb[S <: Stage](hosts: Hosts, packFile: String, usingSudo: Boolean = false,
+final case class InstallDeb[S <: Stage](hosts: Hosts, packFile: String, usingSudo: Boolean = false,
                       usingPar: Boolean = false,
                       exec: String = "/usr/bin/dpkg")(implicit user: User, stage: S, rights: S Allow InstallDeb[S])
   extends GenericTask("dpkg", "install debian package", hosts, exec, List("-i", packFile),
     usingSudo, usingPar, taskRepr = s"install debian package '$packFile'") with UsingSudo[InstallDeb[S]] with UsingParallelExecution[InstallDeb[S]] {
 
-  override def sudo: InstallDeb[S] = this.copy(usingSudo = true)
-  override def par: InstallDeb[S] = this.copy(usingPar = true)
+  override def sudo: InstallDeb[S] = copy[S](usingSudo = true)
+  override def par: InstallDeb[S] = copy[S](usingPar = true)
 }
 
 /**
@@ -354,14 +354,14 @@ case class InstallDeb[S <: Stage](hosts: Hosts, packFile: String, usingSudo: Boo
  * @param exec path to init.d.
  * @param user user.
  */
-case class StartService[S <: Stage](hosts: Hosts, service: String, usingSudo: Boolean = false,
+final case class StartService[S <: Stage](hosts: Hosts, service: String, usingSudo: Boolean = false,
                       usingPar: Boolean = false,
                       exec: String = "/etc/init.d/")(implicit user: User, stage: S, rights: S Allow StartService[S])
   extends GenericTask("service", "start service", hosts, s"$exec$service", List("start"),
     usingSudo, usingPar, taskRepr = s"start service '$service'") with UsingSudo[StartService[S]] with UsingParallelExecution[StartService[S]] {
 
-  override def sudo: StartService[S] = this.copy(usingSudo = true)
-  override def par: StartService[S] = this.copy(usingPar = true)
+  override def sudo: StartService[S] = copy[S](usingSudo = true)
+  override def par: StartService[S] = copy[S](usingPar = true)
 }
 
 /**
@@ -374,13 +374,13 @@ case class StartService[S <: Stage](hosts: Hosts, service: String, usingSudo: Bo
  * @param exec path to init.d.
  * @param user user.
  */
-case class StopService[S <: Stage](hosts: Hosts, service: String, usingSudo: Boolean = false,
+final case class StopService[S <: Stage](hosts: Hosts, service: String, usingSudo: Boolean = false,
                         usingPar: Boolean = false,
                         exec: String = "/etc/init.d/")(implicit user: User, stage: S, rights: S Allow StopService[S])
   extends GenericTask("service", "stop service", hosts, s"$exec$service", List("stop"),
     usingSudo, usingPar, cmd = Stop, taskRepr = s"stop service '$service'")
   with UsingSudo[StopService[S]] with UsingParallelExecution[StopService[S]] {
 
-  override def sudo: StopService[S] = this.copy(usingSudo = true)
-  override def par: StopService[S] = this.copy(usingPar = true)
+  override def sudo: StopService[S] = copy[S](usingSudo = true)
+  override def par: StopService[S] = copy[S](usingPar = true)
 }
