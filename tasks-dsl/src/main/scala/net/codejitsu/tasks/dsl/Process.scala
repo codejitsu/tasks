@@ -34,7 +34,7 @@ case object NoExec extends CommandLine {
   override val args: Array[String] = Array.empty[String]
 }
 
-final case class Process(name: String, host: Host, proc: PartialFunction[Command, CommandLine]) {
+final case class Process(name: String, host: HostLike, proc: PartialFunction[Command, CommandLine]) {
   def startCmd: CommandLine = {
     if (proc.isDefinedAt(Start)) {
       proc(Start)

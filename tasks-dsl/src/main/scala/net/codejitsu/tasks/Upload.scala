@@ -24,7 +24,7 @@ final case class Upload[S <: Stage](target: Hosts,
   extends TaskM[Boolean] with UsingSudo[Upload[S]] with UsingParallelExecution[Upload[S]] {
 
   private lazy val uploadProcs = target.hosts map {
-    case h: Host =>
+    case h: HostLike =>
       val up: Process = "rsync" on Localhost ~> {
         case Start => if (usingSudo) {
           Sudo ~ Exec(exec, "-avzhe", "ssh", source, s"${h.toString()}:$destinationPath")

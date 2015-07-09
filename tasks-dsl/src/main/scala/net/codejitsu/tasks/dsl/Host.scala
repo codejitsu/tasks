@@ -4,7 +4,8 @@ package net.codejitsu.tasks.dsl
 
 import scala.collection.immutable.IndexedSeq
 
-trait HostLike {
+sealed trait HostLike {
+  def parts: collection.immutable.Seq[HostPart]
   def ~ (part: String): HostLike
   def ~[T](part: IndexedSeq[T]): Hosts
   def ~[T <: Product](part: T): Hosts
@@ -40,6 +41,8 @@ final case class Host(parts: collection.immutable.Seq[HostPart]) extends HostLik
 
 case object Localhost extends HostLike {
   override def toString(): String = "localhost"
+
+  override def parts: collection.immutable.Seq[HostPart] = List(HostPart(toString))
 
   override def ~ (part: String): Host = throw new IllegalArgumentException()
 

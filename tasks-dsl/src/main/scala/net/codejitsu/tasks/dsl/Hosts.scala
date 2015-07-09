@@ -5,7 +5,7 @@ package net.codejitsu.tasks.dsl
 /**
  * Group of hosts.
  */
-final case class Hosts(hosts: collection.immutable.Seq[Host]) {
+final case class Hosts(hosts: collection.immutable.Seq[HostLike]) {
   def ~ (part: String): Hosts = {
     val appended = hosts.map(h => Host(h.parts :+ HostPart(part)))
 
@@ -19,7 +19,7 @@ final case class Hosts(hosts: collection.immutable.Seq[Host]) {
 
     val all = vals map (v => this ~ v)
 
-    val together = all.foldLeft(collection.immutable.Seq.empty[Host])((hseq, hosts) => hosts.hosts ++ hseq)
+    val together = all.foldLeft(collection.immutable.Seq.empty[HostLike])((hseq, hosts) => hosts.hosts ++ hseq)
 
     Hosts(together)
   }
@@ -46,7 +46,7 @@ final case class Hosts(hosts: collection.immutable.Seq[Host]) {
 
     val all = vals map (v => this | v)
 
-    val together = all.foldLeft(collection.immutable.Seq.empty[Host])((hseq, hosts) => hosts.hosts ++ hseq)
+    val together = all.foldLeft(collection.immutable.Seq.empty[HostLike])((hseq, hosts) => hosts.hosts ++ hseq)
 
     Hosts(together)
   }
@@ -54,7 +54,7 @@ final case class Hosts(hosts: collection.immutable.Seq[Host]) {
   def | (parts: Host): Hosts = {
     val all = Seq(this | parts.toString())
 
-    val together = all.foldLeft(collection.immutable.Seq.empty[Host])((hseq, hosts) => hosts.hosts ++ hseq)
+    val together = all.foldLeft(collection.immutable.Seq.empty[HostLike])((hseq, hosts) => hosts.hosts ++ hseq)
 
     Hosts(together)
   }

@@ -159,7 +159,7 @@ final case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: Strin
 object PostRequest {
   final val DefaultPort = 8080
 
-  def prepareParams(headers: List[String], data: String, host: Host, path: String, port: Int): List[String] = {
+  def prepareParams(headers: List[String], data: String, host: HostLike, path: String, port: Int): List[String] = {
     val postData: List[String] =
       List("--trace", "-", "-X", "POST") ++
         headers.map(h => s" -H $h") ++
@@ -320,7 +320,7 @@ final case class GetRequest[S <: Stage](hosts: Hosts, path: String,
 object GetRequest {
   final val DefaultPort = 8080
 
-  def prepareParams(host: Host, path: String, port: Int): List[String] =
+  def prepareParams(host: HostLike, path: String, port: Int): List[String] =
     List("--trace", "-", "-X", "GET") ++ List(s"${host.toString()}:$port$path")
 }
 
