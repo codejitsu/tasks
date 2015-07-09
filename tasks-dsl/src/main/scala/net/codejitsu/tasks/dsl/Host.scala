@@ -4,10 +4,17 @@ package net.codejitsu.tasks.dsl
 
 import scala.collection.immutable.IndexedSeq
 
+trait HostLike {
+  def ~ (part: String): HostLike
+  def ~[T](part: IndexedSeq[T]): Hosts
+  def ~[T <: Product](part: T): Hosts
+  def isValid: Boolean
+}
+
 /**
  * Host.
  */
-class Host(val parts: collection.immutable.Seq[HostPart]) {
+final case class Host(parts: collection.immutable.Seq[HostPart]) extends HostLike {
   override def toString(): String = parts.map(_.toString).mkString(".")
 
   def ~ (part: String): Host = Host(parts :+ HostPart(part))
@@ -31,11 +38,7 @@ class Host(val parts: collection.immutable.Seq[HostPart]) {
   def isValid: Boolean = parts.forall(_.isValid)
 }
 
-object Host {
-  def apply(parts: collection.immutable.Seq[HostPart]): Host = new Host(parts)
-}
-
-object Localhost extends Host(List(HostPart("localhost"))) {
+case object Localhost extends HostLike {
   override def toString(): String = "localhost"
 
   override def ~ (part: String): Host = throw new IllegalArgumentException()

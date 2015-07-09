@@ -52,7 +52,7 @@ final case class Process(name: String, host: Host, proc: PartialFunction[Command
   }
 }
 
-final case class ProcessStep(proc: PartialFunction[Command, CommandLine], host: Host)
+final case class ProcessStep(proc: PartialFunction[Command, CommandLine], host: HostLike)
 
 final case class ProcessSteps(steps: collection.immutable.Seq[ProcessStep])
 

@@ -117,7 +117,7 @@ object Tasks {
     }
   }
 
-  implicit class HostOps(val ctx: Host) {
+  implicit class HostOps(val ctx: HostLike) {
     def ~>(proc: PartialFunction[Command, CommandLine]): ProcessStep = ProcessStep(proc, host = ctx)
   }
 
@@ -197,5 +197,5 @@ object Tasks {
     def ~ (s: Sudo.type): SudoHandler = SudoHandler()
   }
 
-  implicit def host2Hosts(host: Host): Hosts = Hosts(List(host))
+  implicit def host2Hosts(host: HostLike): Hosts = Hosts(List(host))
 }

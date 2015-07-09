@@ -51,7 +51,7 @@ object Settings extends Build {
     parallelExecution   in Global     := false,
     ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) },
     wartremoverWarnings in (Compile, compile) ++= Warts.allBut(Wart.NoNeedForMonad,
-      Wart.Throw, Wart.DefaultArguments, Wart.NonUnitStatements)
+      Wart.Throw, Wart.DefaultArguments, Wart.NonUnitStatements, Wart.MutableDataStructures)
   ) ++ publishSettings
 
   val tests = inConfig(Test)(Defaults.testTasks) ++ inConfig(IntegrationTest)(Defaults.itSettings)
