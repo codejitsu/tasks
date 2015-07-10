@@ -16,7 +16,7 @@ object Settings extends Build {
     scalaVersion          := Versions.ScalaVer,
     homepage              := Some(url("http://www.github.com/codejitsu/tasks")),
 
-    crossScalaVersions    := Seq("2.11.6", "2.10.4")
+    crossScalaVersions    := Seq(Versions.ScalaVer, "2.10.4")
   )
 
   override lazy val settings = super.settings ++ buildSettings
