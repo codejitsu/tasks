@@ -39,11 +39,20 @@ object User {
 
   implicit val DefaultUser: User = NoUser
 
+  final val sshTasksJvmPropertyName = "ssh.tasks.properties.file" // Prio 1
+  final val sshTasksEnvironmentVarName = "SSH_TASKS_PROPERTIES_FILE" // Prio 2
+  final val sshTasksDefaultPath =
+    s"/home/${System.getProperty("user.name")}/.ssh-tasks/ssh.properties" // Prio 3
+
   def load: User = {
     val sshT = Try {
       val sshProp = new Properties()
 
-      sshProp.load(new FileInputStream(s"/home/${System.getProperty("user.name")}/.ssh-tasks/ssh.properties"))
+      val sshPath = Option(System.getProperty(sshTasksJvmPropertyName)).
+                    orElse(Option(System.getenv(sshTasksEnvironmentVarName))).
+                    getOrElse(sshTasksDefaultPath)
+
+      sshProp.load(new FileInputStream(sshPath))
 
       val usernameOpt = Option(sshProp.getProperty("username"))
 
