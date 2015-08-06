@@ -28,4 +28,5 @@ object Allow {
   implicit val devAllowStopService: Dev Allow StopService[Dev] = new Allow[Dev, StopService[Dev]]
   implicit val devAllowStartTomcat: Dev Allow StartTomcat[Dev] = new Allow[Dev, StartTomcat[Dev]]
   implicit val devAllowStopTomcat: Dev Allow StopTomcat[Dev] = new Allow[Dev, StopTomcat[Dev]]
+  implicit val devAllowShellScripts: Dev Allow ShellScript[Dev] = new Allow[Dev, ShellScript[Dev]]
 }
