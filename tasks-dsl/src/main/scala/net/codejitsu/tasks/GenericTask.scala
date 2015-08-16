@@ -27,14 +27,15 @@ abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: Strin
     procs ! cmd
   }
 
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
+  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
     LoggedRun(
       verbose,
       usingSudo,
       usingPar,
       hosts,
       taskRepr,
-      task
+      task,
+      input
     )(verbose)
 }
 

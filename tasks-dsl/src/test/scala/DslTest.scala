@@ -472,19 +472,19 @@ class DslTest extends FlatSpec with Matchers {
     }
 
     val task1 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program1 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = (program1 ! Start).run()
     }
 
     val task2 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program2 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = (program2 ! Start).run()
     }
 
     val task3 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program3 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = (program3 ! Start).run()
     }
 
     val task4 = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = (program4 ! Start).run()
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = (program4 ! Start).run()
     }
 
     val composed = task1 andThen task2 andThen task3 andThen task4
@@ -506,16 +506,16 @@ class DslTest extends FlatSpec with Matchers {
   it should "have leftIdentity property" in {
     def f(v: Boolean): TaskM[String] = if (v) {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
       }
     } else {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
       }
     }
 
     val task = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(false), List("a"), List("b"))
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = TaskResult(Success(false), List("a"), List("b"))
     }
 
     val lhs = task.flatMap(f)
@@ -528,31 +528,31 @@ class DslTest extends FlatSpec with Matchers {
   it should "have rightIdentity property" in {
     def f(v: Boolean): TaskM[String] = if (v) {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
       }
     } else {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
       }
     }
 
     def g(v: Boolean): TaskM[String] = if (v) {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("a"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("a"), Nil, Nil)
       }
     } else {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("b"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("b"), Nil, Nil)
       }
     }
 
     val task = new TaskM[Boolean] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(false), List("a"), List("b"))
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = TaskResult(Success(false), List("a"), List("b"))
     }
 
     val lhs = task.flatMap {v =>
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(v), List("a"), List("b"))
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = TaskResult(Success(v), List("a"), List("b"))
       }
     }
 
@@ -564,26 +564,26 @@ class DslTest extends FlatSpec with Matchers {
   it should "have associativity property" in {
     def f(v: String): TaskM[String] = if (v.isEmpty) {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("true"), Nil, Nil)
       }
     } else {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("false"), Nil, Nil)
       }
     }
 
     def g(v: String): TaskM[String] = if (v.isEmpty) {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("a"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("a"), Nil, Nil)
       }
     } else {
       new TaskM[String] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success("b"), Nil, Nil)
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success("b"), Nil, Nil)
       }
     }
 
     val task = new TaskM[String] {
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[String] = TaskResult(Success(""), List("a"), List("b"))
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[String] = TaskResult(Success(""), List("a"), List("b"))
     }
 
     val lhs = task.flatMap(f).flatMap(g)

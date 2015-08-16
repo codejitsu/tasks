@@ -19,7 +19,7 @@ import scala.util.{Success, Failure}
 final case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S Allow Wait[S]) extends TaskM[Boolean] {
   override def description: String = "waiting"
 
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
+  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
     LoggedRun(
       verbose,
       false,
@@ -27,7 +27,7 @@ final case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S 
       Localhost,
       s"$description for ${d.toString}",
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel): TaskResult[Boolean] = {
+        override def run(verbose: VerbosityLevel, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = {
           val promise = Promise[Unit]
 
           val result = try {
@@ -40,6 +40,7 @@ final case class Wait[S <: Stage](d: Duration)(implicit val stage: S, rights: S 
 
           result
         }
-      }
+      },
+      input
     )(verbose)
 }

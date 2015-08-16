@@ -143,7 +143,7 @@ object Tasks {
 
     def !! (op: Command)(implicit user: User, timeout: Duration): TaskM[Boolean] = {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = {
           val tasksF = ctx.procs
             .map(_ ! op)
             .map(t => () => Future {

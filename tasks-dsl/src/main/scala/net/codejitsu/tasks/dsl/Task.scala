@@ -27,26 +27,26 @@ trait UsingParallelExecution[T <: UsingParallelExecution[T]] { this: T =>
 trait TaskM[+R] extends Description {
   self =>
 
-  def run(verbose: VerbosityLevel = NoOutput): TaskResult[R]
+  def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[R]
 
   def apply(): TaskResult[R] = run()
 
   def andThen[T >: R](task: TaskM[T]): TaskM[T] = this flatMap (_ => task)
 
   def map[U](f: R => U): TaskM[U] = new TaskM[U] {
-    override def run(verbose: VerbosityLevel = NoOutput): TaskResult[U] = {
+    override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[U] = {
       val selfRes = self.run(verbose)
       selfRes.copy[U](res = selfRes.res.map(f))
     }
   }
 
   def flatMap[T](f: R => TaskM[T]): TaskM[T] = new TaskM[T] {
-    override def run(verbose: VerbosityLevel = NoOutput): TaskResult[T] = {
+    override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[T] = {
       val selfRes: TaskResult[R] = self.run(verbose)
 
       selfRes.res match {
         case Success(r) =>
-          val nextRes = f(r).run(verbose)
+          val nextRes = f(r).run(verbose, input)
 
           nextRes.copy[T](out = selfRes.out ++ nextRes.out, err = selfRes.err ++ nextRes.err)
 
@@ -56,7 +56,7 @@ trait TaskM[+R] extends Description {
   }
 
   def orElse[T >: R](task: TaskM[T]): TaskM[T] = new TaskM[T] {
-    override def run(verbose: VerbosityLevel = NoOutput): TaskResult[T] = {
+    override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[T] = {
       val selfRes: TaskResult[T] = self.run(verbose)
 
       selfRes.res match {
@@ -65,11 +65,22 @@ trait TaskM[+R] extends Description {
       }
     }
   }
+
+  def pipeTo[T](task: TaskM[T]): TaskM[T] = new TaskM[T] {
+    override def run(verbose: VerbosityLevel, input: Option[TaskResult[_]] = None): TaskResult[T] = {
+      val selfRes: TaskResult[R] = self.run(verbose)
+
+      selfRes.res match {
+        case Success(r) => task.run(verbose, Option(selfRes))
+        case Failure(e) => TaskResult[T](Failure[T](e), selfRes.out, selfRes.err)
+      }
+    }
+  }
 }
 
 object LoggedRun {
   def apply[R](verbose: VerbosityLevel, usingSudo: Boolean, usingPar: Boolean,
-             hosts: Hosts, desc: String, task: TaskM[R]): (VerbosityLevel => TaskResult[R]) = {
+             hosts: Hosts, desc: String, task: TaskM[R], input: Option[TaskResult[_]]): (VerbosityLevel => TaskResult[R]) = {
     val logRun: (VerbosityLevel => TaskResult[R]) = { v =>
       verbose match {
         case Verbose | FullOutput =>
@@ -96,7 +107,7 @@ object LoggedRun {
         case _ =>
       }
 
-      val result = task.run(v)
+      val result = task.run(v, input)
 
       verbose match {
         case Verbose | FullOutput => println("--------------------------------------------------------------")
@@ -111,18 +122,20 @@ object LoggedRun {
 }
 
 final case class FailedTask(out: List[String], err: List[String]) extends TaskM[Boolean] {
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Failure[Boolean](new TaskExecutionError(Nil)), Nil, Nil)
+  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
+    TaskResult(Failure[Boolean](new TaskExecutionError(Nil)), Nil, Nil)
 }
 
 final case object SuccessfulTask extends TaskM[Boolean] {
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = TaskResult(Success(true), Nil, Nil)
+  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
+    TaskResult(Success(true), Nil, Nil)
 }
 
 class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) extends TaskM[Boolean] {
   import scala.collection.mutable.ListBuffer
   import scala.sys.process._
 
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = op match {
+  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = op match {
     case Start => execute(ctx.startCmd, verbose)
     case Stop => execute(ctx.stopCmd, verbose)
   }

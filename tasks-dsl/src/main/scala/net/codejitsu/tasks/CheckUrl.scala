@@ -34,7 +34,7 @@ final case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = Ch
         case _ =>
       }
 
-      override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
+      override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = {
         import scala.io.Source
 
         val prot = if (host.toString().startsWith("http://")) {
@@ -84,17 +84,17 @@ final case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = Ch
     case _ =>
   }
 
-  override def run(verbose: VerbosityLevel): TaskResult[Boolean] = {
+  override def run(verbose: VerbosityLevel, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = {
     printTaskProgress(verbose)
 
     val tasksFold = if (usingPar) {
       new TaskM[Boolean] {
-        override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] = {
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = {
           import scala.concurrent.ExecutionContext.Implicits.global
 
           val tasksF = tasks
             .map(t => () => Future {
-            t.run(verbose)
+            t.run(verbose, input)
           })
 
           val tasksFRes = Future.sequence(tasksF.map(_()))
@@ -124,7 +124,7 @@ final case class CheckUrl[S <: Stage](hosts: Hosts, path: String, port: Int = Ch
       tasks.foldLeft[TaskM[Boolean]](SuccessfulTask)((acc, t) => acc flatMap(_ => t))
     }
 
-    val result = tasksFold.run(verbose)
+    val result = tasksFold.run(verbose, input)
 
     verbose match {
       case Verbose | FullOutput => println("--------------------------------------------------------------")

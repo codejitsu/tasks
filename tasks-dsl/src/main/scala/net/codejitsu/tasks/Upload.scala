@@ -44,14 +44,15 @@ final case class Upload[S <: Stage](target: Hosts,
 
   override def description: String = "upload file(s)"
 
-  override def run(verbose: VerbosityLevel = NoOutput): TaskResult[Boolean] =
+  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
     LoggedRun(
       verbose,
       usingSudo,
       usingPar,
       target,
       s"$description '${source}' -> '${destinationPath}'",
-      uploadTask
+      uploadTask,
+      input
     )(verbose)
 
   override def sudo: Upload[S] = copy[S](usingSudo = true)
