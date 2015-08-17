@@ -191,7 +191,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
         (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
       case Exec(_, _*) if !inputStr.isEmpty =>
-        (s"""/bin/echo -e $inputStr""" #| s"""/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}""" run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
+        (s"/bin/echo $inputStr" #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
       case NoExec => 0
     }
@@ -214,7 +214,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
   }
 
   private def mkInput(input: Option[TaskResult[_]]): Option[String] = input.map { res =>
-    res.out.mkString("\\n")
+    res.out.mkString(System.lineSeparator())
   }
 
   private def buildSshCommandFor(remoteHost: Host, cmd: CommandLine, sshu: User with SshCredentials) = {
