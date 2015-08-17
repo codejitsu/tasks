@@ -18,6 +18,7 @@ sealed trait CommandLine {
   def path: String
   def args: Array[String]
   def cmd: String = s"$path ${args.mkString(" ")}"
+  def shortPath: String = path.split("/").last
 }
 
 final case class Exec(path: String, params: String*) extends CommandLine {

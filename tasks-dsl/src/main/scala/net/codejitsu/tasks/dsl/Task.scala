@@ -31,7 +31,7 @@ trait TaskM[+R] extends Description {
 
   def apply(): TaskResult[R] = run()
 
-  def andThen[T >: R](task: TaskM[T]): TaskM[T] = this flatMap (_ => task)
+  def andThen[T >: R](task: TaskM[T]): TaskM[T] = self flatMap (_ => task)
 
   def map[U](f: R => U): TaskM[U] = new TaskM[U] {
     override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[U] = {
@@ -136,8 +136,8 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
   import scala.sys.process._
 
   override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] = op match {
-    case Start => execute(ctx.startCmd, verbose)
-    case Stop => execute(ctx.stopCmd, verbose)
+    case Start => execute(ctx.startCmd, verbose, input)
+    case Stop => execute(ctx.stopCmd, verbose, input)
   }
 
   def doOut(out: ListBuffer[String], verbose: VerbosityLevel)(line: String): Unit = {
@@ -149,7 +149,8 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }
 
-  private def mkCommandLog(cmd: CommandLine, verbose: VerbosityLevel): String = verbose match {
+  private def mkCommandLog(cmd: CommandLine, verbose: VerbosityLevel, input: Option[TaskResult[_]]): String = verbose match {
+    //TODO print input too
     case Verbose => s"${op.cmd} ${ctx.name} on '${ctx.host.toString}'"
     case FullOutput => s"$op '${ctx.name}' (${cmd.cmd}) on '${ctx.host.toString}'"
     case _ => ""
@@ -168,19 +169,29 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     case _ =>
   }
 
-  private def executeOnLocalhost(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = {
+  private def executeOnLocalhost(cmd: CommandLine, verbose: VerbosityLevel, input: Option[TaskResult[_]]): TaskResult[Boolean] = {
     val out = ListBuffer[String]()
     val err = ListBuffer[String]()
 
-    val msg = mkCommandLog(cmd, verbose)
+    val msg = mkCommandLog(cmd, verbose, input)
+
+    val inputOpt = mkInput(input)
+
+    val inputStr = inputOpt match {
+      case Some(in) => in
+      case _ => ""
+    }
 
     val result = cmd match {
       case SudoExec(_, _*) =>
-        (s"echo '${user.localPassword().mkString}' | ${cmd.cmd}" run (ProcessLogger(doOut(out, verbose)(_),
+        (s"/bin/echo '${user.localPassword().mkString}' | ${cmd.cmd}" run (ProcessLogger(doOut(out, verbose)(_),
           doOut(err, verbose)(_)))).exitValue()
 
-      case Exec(_, _*) =>
+      case Exec(_, _*) if inputStr.isEmpty =>
         (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
+
+      case Exec(_, _*) if !inputStr.isEmpty =>
+        (s"""/bin/echo -e $inputStr""" #| s"""/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}""" run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
       case NoExec => 0
     }
@@ -202,6 +213,10 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }
 
+  private def mkInput(input: Option[TaskResult[_]]): Option[String] = input.map { res =>
+    res.out.mkString("\\n")
+  }
+
   private def buildSshCommandFor(remoteHost: Host, cmd: CommandLine, sshu: User with SshCredentials) = {
     val noHostKeyChecking = "-o" :: "UserKnownHostsFile=/dev/null" :: "-o" :: "StrictHostKeyChecking=no" :: Nil
     val keyFileArgs = sshu.keyFile.toList.flatMap("-i" :: _.getPath :: Nil)
@@ -219,11 +234,11 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }
 
-  private def executeRemoteSsh(remoteHost: Host, cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = {
+  private def executeRemoteSsh(remoteHost: Host, cmd: CommandLine, verbose: VerbosityLevel, input: Option[TaskResult[_]]): TaskResult[Boolean] = {
     val out = ListBuffer[String]()
     val err = ListBuffer[String]()
 
-    val msg = mkCommandLog(cmd, verbose)
+    val msg = mkCommandLog(cmd, verbose, input)
 
     def remoteCommandLine(user: User): List[String] = try {
       user match {
@@ -267,8 +282,9 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }
 
-  private def execute(cmd: CommandLine, verbose: VerbosityLevel): TaskResult[Boolean] = ctx.host match {
-    case Localhost => executeOnLocalhost(cmd, verbose)
-    case remoteHost: Host => executeRemoteSsh(remoteHost, cmd, verbose)
+  private def execute(cmd: CommandLine, verbose: VerbosityLevel,
+                      input: Option[TaskResult[_]]): TaskResult[Boolean] = ctx.host match {
+    case Localhost => executeOnLocalhost(cmd, verbose, input)
+    case remoteHost: Host => executeRemoteSsh(remoteHost, cmd, verbose, input)
   }
 }

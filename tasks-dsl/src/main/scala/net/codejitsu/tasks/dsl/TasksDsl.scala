@@ -147,7 +147,7 @@ object Tasks {
           val tasksF = ctx.procs
             .map(_ ! op)
             .map(t => () => Future {
-              t.run(verbose)
+              t.run(verbose, input)
             })
 
           val tasksFRes = Future.sequence(tasksF.map(_()))
@@ -195,6 +195,29 @@ object Tasks {
 
     def ~[T <: UsingParallelExecution[T]](task: T): T = task.par
     def ~ (s: Sudo.type): SudoHandler = SudoHandler()
+  }
+
+  final case class Clear[S <: Stage](implicit user: User, stage: S, rights: S Allow Clear[S]) extends TaskM[Boolean] {
+    self =>
+
+    override def run(verbose: VerbosityLevel, input: Option[TaskResult[_]]): TaskResult[Boolean] = {
+      TaskResult(Success(true), Nil, Nil)
+    }
+
+    override def flatMap[T](f: Boolean => TaskM[T]): TaskM[T] = {
+      new TaskM[T] {
+        override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[T] = {
+          val selfRes: TaskResult[Boolean] = self.run(verbose, input)
+
+          selfRes.res match {
+            case Success(r) =>
+              val nextRes = f(r).run(verbose, input)
+              nextRes.copy[T](out = Nil, err = Nil)
+            case Failure(e) => TaskResult[T](Failure[T](e), selfRes.out, selfRes.err)
+          }
+        }
+      }
+    }
   }
 
   implicit def host2Hosts(host: HostLike): Hosts = Hosts(List(host))

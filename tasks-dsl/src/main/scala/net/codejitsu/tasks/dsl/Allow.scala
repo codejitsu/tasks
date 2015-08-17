@@ -3,6 +3,7 @@
 package net.codejitsu.tasks.dsl
 
 import net.codejitsu.tasks._
+import net.codejitsu.tasks.dsl.Tasks.Clear
 
 import scala.annotation.implicitNotFound
 
@@ -30,4 +31,7 @@ object Allow {
   implicit val devAllowStopTomcat: Dev Allow StopTomcat[Dev] = new Allow[Dev, StopTomcat[Dev]]
   implicit val devAllowShellScripts: Dev Allow ShellScript[Dev] = new Allow[Dev, ShellScript[Dev]]
   implicit val devAllowEcho: Dev Allow Echo[Dev] = new Allow[Dev, Echo[Dev]]
+  implicit val devAllowCat: Dev Allow Cat[Dev] = new Allow[Dev, Cat[Dev]]
+  implicit val devAllowTail: Dev Allow Tail[Dev] = new Allow[Dev, Tail[Dev]]
+  implicit val devAllowClear: Dev Allow Clear[Dev] = new Allow[Dev, Clear[Dev]]
 }
