@@ -1,3 +1,5 @@
+// Copyright (C) 2015, codejitsu.
+
 package net.codejitsu.tasks
 
 import net.codejitsu.tasks.dsl._

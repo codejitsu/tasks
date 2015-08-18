@@ -35,14 +35,12 @@ class TailTest extends FlatSpec with Matchers {
     val pathSh = getClass.getResource("/program-tail.sh").getPath
 
     val task =
-      Touch(Localhost, path + name) pipeTo
+      Touch(Localhost, path + name) andThen
       ShellScript(Localhost, pathSh, List("test")) pipeTo
-      Echo(Localhost, target = Option(path + name)) pipeTo
+      Echo(Localhost, target = Option(path + name)) andThen
       Tail(Localhost, Option(path + name), params = List("-n", "1"))
 
     val taskResult = task.run()
-
-    println(taskResult.out)
 
     file2create.exists should be (true)
 

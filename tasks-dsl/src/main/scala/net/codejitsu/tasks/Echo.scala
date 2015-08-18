@@ -20,8 +20,8 @@ final case class Echo[S <: Stage](hosts: Hosts,
                                   usingSudo: Boolean = false,
                                   usingPar: Boolean = false,
                                   exec: String = "/bin/echo",
-                                  params: List[String] = Nil)(implicit user: User, stage: S, rights: S Allow Echo[S])
-  extends GenericTask("echo", "display a line of text", hosts, exec, List(text) ++ params ++ Echo.checkTarget(target),
+                                  params: List[String] = List("-e"))(implicit user: User, stage: S, rights: S Allow Echo[S])
+  extends GenericTask("echo", "display a line of text", hosts, exec, params ++ List(text) ++ Echo.checkTarget(target),
     usingSudo, usingPar, taskRepr = s"display text '${text}'") with UsingSudo[Echo[S]] with UsingParallelExecution[Echo[S]] {
   //TODO truncate text to N characters
 

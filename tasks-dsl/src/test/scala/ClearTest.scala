@@ -27,18 +27,17 @@ class ClearTest extends FlatSpec with Matchers {
     val task =
         Touch(Localhost, path + name) andThen
         ShellScript(Localhost, pathSh, List("test")) pipeTo
-        Echo(Localhost, target = Option(path + name)) andThen
+        Echo(Localhost, target = Option(path + name)) pipeTo
+        Clear() andThen
         Tail(Localhost, Option(path + name), params = List("-n", "1"))
-        Clear()
 
     val taskResult = task.run()
 
     file2create.exists should be (true)
 
     taskResult.res.isSuccess should be (true)
-// FIXME
-//    taskResult.err should be (empty)
-//    taskResult.out should be (List("9 start test program with param: test"))
+    taskResult.err should be (empty)
+    taskResult.out should be (List("9 start test program with param: test"))
 
     file2create.delete
   }
