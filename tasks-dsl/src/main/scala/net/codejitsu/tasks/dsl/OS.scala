@@ -15,7 +15,7 @@ case object UnknownOs extends OperationSystem
 object OS {
   def getCurrentOs(): OperationSystem = {
     val osName = System.getProperty("os.name").toLowerCase()
-    
+
     if(osName.contains("linux")) {
       Linux
     } else if(osName.contains("windows")) {

@@ -175,12 +175,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     val msg = mkCommandLog(cmd, verbose, input)
 
-    val inputOpt = mkInput(input)
-
-    val inputStr = inputOpt match {
-      case Some(in) => in
-      case _ => ""
-    }
+    val inputStr = mkInput(input)
 
     val result = cmd match {
       case SudoExec(_, _*) =>
@@ -192,8 +187,13 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
       case Exec(_, _*) if !inputStr.isEmpty =>
         OS.getCurrentOs() match {
-          case Linux => (s"/bin/echo -e $inputStr" #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
-          case MacOS => (Seq("/bin/echo", inputStr) #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
+          case Linux =>
+            (Seq("/bin/echo", "-e", inputStr) #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run
+//            ((Seq("/bin/echo", "-e", "'" + inputStr + "'") #| (Seq("/usr/bin/xargs", "-0", "-I", "{}", cmd.path) ++ cmd.args ++ Seq("{}"))) run
+              (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
+          case MacOS =>
+            (Seq("/bin/echo", inputStr) #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run
+              (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
           case _ =>
         }
 
@@ -217,13 +217,13 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }
 
-  private def mkInput(input: Option[TaskResult[_]]): Option[String] = input.map { res =>
+  private def mkInput(input: Option[TaskResult[_]]): String = input.map { res =>
     OS.getCurrentOs() match {
       case Linux => res.out.mkString("\\n")
       case MacOS => res.out.mkString(System.lineSeparator())
       case _ => res.out.mkString(System.lineSeparator())
     }
-  }
+  }.getOrElse("")
 
   private def buildSshCommandFor(remoteHost: Host, cmd: CommandLine, sshu: User with SshCredentials) = {
     val noHostKeyChecking = "-o" :: "UserKnownHostsFile=/dev/null" :: "-o" :: "StrictHostKeyChecking=no" :: Nil
