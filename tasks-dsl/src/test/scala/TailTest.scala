@@ -41,12 +41,11 @@ class TailTest extends FlatSpec with Matchers {
       Tail(Localhost, Option(path + name), params = List("-n", "1"))
 
     val taskResult = task.run()
-
     file2create.exists should be (true)
 
     taskResult.res.isSuccess should be (true)
     taskResult.err should be (empty)
-    taskResult.out.count(_ == "9 start test program with param: test") should be (2)
+    taskResult.out should be (List("9 start test program with param: test"))
 
     file2create.delete
   }

@@ -15,7 +15,7 @@ class PipeToTest extends FlatSpec with Matchers {
   "pipeTo" should "feed the next task with output from current task" in {
     val pathSh = getClass.getResource("/program-param.sh").getPath
 
-    val task = ShellScript(Localhost, pathSh, List("test")) pipeTo Cat(Localhost)
+    val task = ShellScript(Localhost, pathSh, List("test")) pipeTo Echo(Localhost)
     val taskResult = task.run()
 
     taskResult.res.isSuccess should be (true)

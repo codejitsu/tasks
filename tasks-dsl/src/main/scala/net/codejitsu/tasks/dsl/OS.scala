@@ -30,4 +30,6 @@ object OS {
   }
 
   def isLinux(): Boolean = getCurrentOs() == Linux
+
+  def isMacOs(): Boolean = getCurrentOs() == MacOS
 }

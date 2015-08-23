@@ -20,8 +20,8 @@ final case class Echo[S <: Stage](hosts: Hosts,
                                   usingSudo: Boolean = false,
                                   usingPar: Boolean = false,
                                   exec: String = "/bin/echo",
-                                  params: List[String] = if (OS.isLinux()) List("-e") else Nil)(implicit user: User, stage: S, rights: S Allow Echo[S])
-  extends GenericTask("echo", "display a line of text", hosts, exec, params ++ List(text) ++ Echo.checkTarget(target),
+                                  params: List[String] = Echo.defaultParams())(implicit user: User, stage: S, rights: S Allow Echo[S])
+  extends GenericTask("echo", "display a line of text", hosts, exec, params ++ Echo.checkText(text) ++ Echo.checkTarget(target),
     usingSudo, usingPar, taskRepr = s"display text '${text}'") with UsingSudo[Echo[S]] with UsingParallelExecution[Echo[S]] {
   //TODO truncate text to N characters
 
@@ -31,7 +31,15 @@ final case class Echo[S <: Stage](hosts: Hosts,
 
 object Echo {
   private def checkTarget(target: Option[String]): List[String] = target match {
-    case Some(file) => List(file)
+    case Some(file) => List(">", file)
+    case _ => Nil
+  }
+
+  private def checkText(text: String): List[String] = if (text.length == 0) Nil else List(text)
+
+  private def defaultParams(): List[String] = OS.getCurrentOs() match {
+    case Linux => List("-e")
+    case MacOS => List("-n")
     case _ => Nil
   }
 }

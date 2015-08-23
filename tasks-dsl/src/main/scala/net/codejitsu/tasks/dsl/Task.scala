@@ -2,6 +2,8 @@
 
 package net.codejitsu.tasks.dsl
 
+import java.io.File
+
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -186,16 +188,23 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
         (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
       case Exec(_, _*) if !inputStr.isEmpty =>
-        OS.getCurrentOs() match {
-          case Linux =>
-            (Seq("/bin/echo", "-e", inputStr) #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run
-//            ((Seq("/bin/echo", "-e", "'" + inputStr + "'") #| (Seq("/usr/bin/xargs", "-0", "-I", "{}", cmd.path) ++ cmd.args ++ Seq("{}"))) run
-              (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
-          case MacOS =>
-            (Seq("/bin/echo", inputStr) #| s"/usr/bin/tee >(${cmd.shortPath})${cmd.args.mkString(" ")}" run
-              (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
-          case _ =>
+        val (args: Array[String], file: Option[String]) = extractFileFromArgs(cmd)
+
+        val command  = OS.getCurrentOs() match {
+          case Linux => file match {
+              case None => Seq("/bin/echo", "-e", inputStr) #| (Seq("/usr/bin/xargs", cmd.path) ++ args)
+              case Some(f) => Seq("/bin/echo", inputStr) #| (Seq("/usr/bin/xargs", "-d", "\\n", cmd.path) ++ args) #> new File(f)
+            }
+
+          case MacOS => file match {
+              case None => Seq("/bin/echo", inputStr) #| (Seq("/usr/bin/xargs", "-0", cmd.path) ++ args)
+              case Some(f) => Seq("/bin/echo", "-n", inputStr) #| (Seq("/usr/bin/xargs", "-0", cmd.path) ++ args) #> new File(f)
+            }
+
+          case _ => throw new IllegalArgumentException("Not supported OS")
         }
+
+        (command run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
       case NoExec => 0
     }
@@ -215,6 +224,20 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
       TaskResult(Failure[Boolean](new TaskExecutionError(err.toList)), out.toList, err.toList)
     }
+  }
+
+  def extractFileFromArgs(cmd: CommandLine): (Array[String], Option[String]) = {
+    val args = cmd.args.takeWhile(_ != ">")
+    val fileData = cmd.args.dropWhile(_ != ">")
+
+    val file = if (fileData.isEmpty) {
+      None
+    } else if (fileData.size == 2) {
+      Some(fileData(1))
+    } else {
+      None
+    }
+    (args, file)
   }
 
   private def mkInput(input: Option[TaskResult[_]]): String = input.map { res =>
