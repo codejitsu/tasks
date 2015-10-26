@@ -1,0 +1,1525 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" xmlns:re="http://purl.org/atompub/rank/1.0">
+    <title type="text">Newest questions tagged scala - Stack Overflow</title>
+    <link rel="self" href="http://stackoverflow.com/feeds/tag?tagnames=scala&amp;sort=newest" type="application/atom+xml" />
+    <link rel="alternate" href="http://stackoverflow.com/questions/tagged/?tagnames=scala&amp;sort=newest" type="text/html" />
+    <subtitle>most recent 30 from stackoverflow.com</subtitle>
+    <updated>2015-10-25T21:08:59Z</updated>
+    <id>http://stackoverflow.com/feeds/tag?tagnames=scala&amp;sort=newest</id>
+    <creativeCommons:license>http://www.creativecommons.org/licenses/by-sa/3.0/rdf</creativeCommons:license> 
+    <entry>
+        <id>http://stackoverflow.com/q/33335040</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Scala - Count the number of occurrences of every key in an Iterator</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="iterator" />
+        <author>
+            <name>Haseeb Javed</name>
+            <uri>http://stackoverflow.com/users/1905222</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33335040/scala-count-the-number-of-occurrences-of-every-key-in-an-iterator" />
+        <published>2015-10-25T21:01:27Z</published>
+        <updated>2015-10-25T21:01:27Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have an iterator containing some key value pairs.
+e.g &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;(jen,xyz) (ken, zxy) (jen,asd) (ken, asdf)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The results should be &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;(jen,2) (ken, 2)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;How do I use the count function (or any other) to count the number of occurrences of each key in the iterator of that particular collection.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33334938</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Return instance of inner class in nested classes</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+        <author>
+            <name>qed</name>
+            <uri>http://stackoverflow.com/users/562222</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33334938/return-instance-of-inner-class-in-nested-classes" />
+        <published>2015-10-25T20:49:24Z</published>
+        <updated>2015-10-25T20:49:24Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Here is the code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import scala.collection.mutable
+
+/**
+ * Created by IDEA on 25/10/15.
+ */
+class HttpRequest(builder: Builder) {
+  val headers: Map[String, String]
+  var body: String
+  var path: String
+
+  class Builder {innerBuilder =&amp;gt;
+    private val headers = new mutable.HashMap[String, String]()
+    private var body: String = _
+    private var path: String = _
+
+    def addHeader(name: String, value: String): Unit = {
+      headers.put(name, value)
+      innerBuilder
+    }
+
+    def body(b: String): Builder = {
+      body = b
+      innerBuilder
+    }
+
+    def path(p: String) = {
+      path = p
+      innerBuilder
+    }
+
+    def build: HttpRequest = {
+      new HttpRequest(innerBuilder)
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I got two errors: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Error:(27, 7) overloaded method path needs result type
+      path = p
+      ^
+Error:(32, 23) type mismatch;
+ found   : HttpRequest.this.Builder
+ required: Builder
+      new HttpRequest(innerBuilder)
+                      ^
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What did I do wrong?&lt;/p&gt;
+
+&lt;p&gt;BTW, I was trying to translate this java file into scala: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/***
+ * Excerpted from &quot;Functional Programming Patterns&quot;,
+ * published by The Pragmatic Bookshelf.
+ * Copyrights apply to this code. It may not be used to create training material, 
+ * courses, books, articles, and the like. Contact us if you are in doubt.
+ * We make no guarantees that this code is fit for any purpose. 
+ * Visit http://www.pragmaticprogrammer.com/titles/mbfpp for more book information.
+***/
+package com.mblinn.oo.tinyweb;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+public class HttpRequest {
+    private Map&amp;lt;String, String&amp;gt; headers;
+    private String body;
+    private String path;
+
+    public Map&amp;lt;String, String&amp;gt; getHeaders() {
+        return headers;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    private HttpRequest(Builder builder) {
+        this.headers = Collections.unmodifiableMap(builder.headers);
+        this.body = builder.body;
+        this.path = builder.path;
+    }
+
+    public static class Builder {
+        private Map&amp;lt;String, String&amp;gt; headers;
+        private String body;
+        private String path;
+
+        private Builder() {
+            headers = new HashMap&amp;lt;String, String&amp;gt;();
+        }
+
+        public Builder addHeader(String name, String value) {
+            headers.put(name, value);
+            return this;
+        }
+
+        public Builder body(String body) {
+            this.body = body;
+            return this;
+        }
+
+        public Builder path(String path) {
+            this.path = path;
+            return this;
+        }
+
+        public HttpRequest build() {
+            return new HttpRequest(this);
+        }
+
+        public static Builder newBuilder() {
+            return new Builder();
+        }
+
+        public static Builder builderFrom(HttpRequest request) {
+            Builder builder = new Builder();
+            builder.path(request.getPath());
+            builder.body(request.getBody());
+
+            Map&amp;lt;String, String&amp;gt; headers = request.getHeaders();
+            for (String headerName : headers.keySet())
+                builder.addHeader(headerName, 
+                        headers.get(headerName));
+
+            return builder;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33334780</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">How to deal with session in Play framework slick plugin?</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="playframework-2.3" />
+            <category scheme="http://stackoverflow.com/tags" term="slick-2.0" />
+            <category scheme="http://stackoverflow.com/tags" term="play-slick" />
+        <author>
+            <name>mad_programmer</name>
+            <uri>http://stackoverflow.com/users/262914</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33334780/how-to-deal-with-session-in-play-framework-slick-plugin" />
+        <published>2015-10-25T20:33:16Z</published>
+        <updated>2015-10-25T20:33:16Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I started with Application controller, and till that time everything was alright, including the database operations. Here is my Application.scala file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package controllers
+
+import play.api.mvc._
+
+
+object Application extends Controller {
+
+  def index = Action {
+
+    Redirect(routes.CompanyController.company())
+  }
+
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And I created one more controller and moved company related actions there, here is how it looks like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package controllers
+
+import assets.getForms._
+import play.api.db.slick.DBAction
+import play.api.libs.json.Json
+import play.api.libs.json.Json._
+import play.api.mvc.{Action, Controller}
+import play.api.db.slick.Config.driver.simple._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import play.api.Play.current
+
+import models.{Company, CompanyTable}
+
+/**
+ * Created by asfsfsd on 10/25/15.
+ */
+object CompanyController extends Controller{
+  val companyTable = TableQuery[CompanyTable]
+
+  //JSON read/write macro
+  implicit val companyJsonFormat = Json.format[Company]
+
+  def company = Action {
+    Ok(views.html.addcompany(&quot;Please register your company.&quot;, CompanyForm))
+  }
+
+  def saveCompany = DBAction { implicit rs =&amp;gt;
+    CompanyForm.bindFromRequest.fold(
+      formWithErrors =&amp;gt; {
+        BadRequest(&quot;something wrong.&quot;+ formWithErrors)
+      },
+      Company =&amp;gt; {
+        play.api.db.slick.DB.withSession{ implicit session =&amp;gt;
+          val insertCompany = companyTable.insert(Company)
+          Redirect(routes.CompanyController.company())
+        }
+
+      }
+    )
+
+
+  }
+
+  def jsonListAllCompany = DBAction { implicit rs =&amp;gt;
+    rs.dbSession
+    Ok(toJson(companyTable.list))
+  }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It then started complaining about dbsession, and the error said:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;could not find implicit value for parameter session: scala.slick.jdbc.JdbcBackend#SessionDef
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I kind of fixed it for saveCompany method, and now its giving the same message for jsonListAllCompany method. I could do the same for jsonListAllCompany method as well as I did for saveCompany method, but my question is why this was not the problem when there was only one controller and that is Application controller?
+Am I missing something crucial, or how to use this with ease?&lt;/p&gt;
+
+&lt;p&gt;I am new to scala and new to playframework as well.I am using play framework 2.3.8 and play slick plugin 0.8.1 with scala 2.10.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33334456</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">flink: scala version conflict?</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="intellij-idea" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-flink" />
+        <author>
+            <name>ethrbunny</name>
+            <uri>http://stackoverflow.com/users/491682</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33334456/flink-scala-version-conflict" />
+        <published>2015-10-25T20:01:34Z</published>
+        <updated>2015-10-25T20:01:34Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Am attempting to compile the kafka sample from &lt;a href=&quot;https://github.com/dataArtisans/kafka-example&quot; rel=&quot;nofollow&quot;&gt;here&lt;/a&gt; in IntelliJ. After much fussing with dependencies have run into this issue that I can&#39;t seem to get past:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;15/10/25 12:36:34 ERROR actor.ActorSystemImpl: Uncaught fatal error from thread [flink-akka.actor.default-dispatcher-4] shutting down ActorSystem [flink]
+java.lang.NoClassDefFoundError: scala/runtime/AbstractPartialFunction$mcVL$sp
+at java.lang.ClassLoader.defineClass1(Native Method)
+at java.lang.ClassLoader.defineClass(ClassLoader.java:760)
+at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+at java.net.URLClassLoader.defineClass(URLClassLoader.java:455)
+at java.net.URLClassLoader.access$100(URLClassLoader.java:73)
+at java.net.URLClassLoader$1.run(URLClassLoader.java:367)
+at java.net.URLClassLoader$1.run(URLClassLoader.java:361)
+at java.security.AccessController.doPrivileged(Native Method)
+at java.net.URLClassLoader.findClass(URLClassLoader.java:360)
+at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:308)
+at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+at org.apache.flink.runtime.jobmanager.MemoryArchivist.handleMessage(MemoryArchivist.scala:80)
+at org.apache.flink.runtime.FlinkActor$class.receive(FlinkActor.scala:32)
+at org.apache.flink.runtime.jobmanager.MemoryArchivist.org$apache$flink$runtime$LogMessages$$super$receive(MemoryArchivist.scala:59)
+at org.apache.flink.runtime.LogMessages$class.receive(LogMessages.scala:26)
+at org.apache.flink.runtime.jobmanager.MemoryArchivist.receive(MemoryArchivist.scala:59)
+at akka.actor.ActorCell.newActor(ActorCell.scala:567)
+at akka.actor.ActorCell.create(ActorCell.scala:587)
+at akka.actor.ActorCell.invokeAll$1(ActorCell.scala:460)
+at akka.actor.ActorCell.systemInvoke(ActorCell.scala:482)
+at akka.dispatch.Mailbox.processAllSystemMessages(Mailbox.scala:282)
+at akka.dispatch.Mailbox.run(Mailbox.scala:223)
+at akka.dispatch.Mailbox.exec(Mailbox.scala:234)
+at scala.concurrent.forkjoin.ForkJoinTask.doExec(ForkJoinTask.java:260)
+at scala.concurrent.forkjoin.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1339)
+at scala.concurrent.forkjoin.ForkJoinPool.runWorker(ForkJoinPool.java:1979)
+at scala.concurrent.forkjoin.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:107)
+
+
+Caused by: java.lang.ClassNotFoundException: scala.runtime.AbstractPartialFunction$mcVL$sp
+at java.net.URLClassLoader$1.run(URLClassLoader.java:372)
+at java.net.URLClassLoader$1.run(URLClassLoader.java:361)
+at java.security.AccessController.doPrivileged(Native Method)
+at java.net.URLClassLoader.findClass(URLClassLoader.java:360)
+at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:308)
+at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+... 28 more
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I&#39;ve run across a few notions that suggest this is an issue with the scala version. Current library list:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;flink-runtime-1.0-SNAPSHOT
+flink-streaming-java-1.0-SNAPSHOT
+flink-connector-kafka-1.0-SNAPSHOT
+flink-java8-1.0-SNAPSHOT
+flink-core-1.0-SNAPSHOT
+flink-java-1.0-SNAPSHOT
+org.apache.hadoop:hadoop-core:1.2.1
+flink-clients-1.0-SNAPSHOT
+org.apache.kafka:kafka-clients:0.8.2.2
+org.apache.kafka:kafka_2.11:0.8.2.2
+flink-optimizer-1.0-SNAPSHOT
+org.apache.sling:org.apache.sling.commons.json:2.0.6
+de.javakaffee:kryo-serializers:0.28
+com.github.scopt:scopt_2.11:3.3.0
+org.clapper:grizzled-slf4j_2.9.0:0.6.6
+com.typesafe.akka:akka-osgi_2.11:2.4.0
+com.typesafe.akka:akka-slf4j_2.11:2.4.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Suggestions on where I&#39;ve run astray?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33334053</id>
+        <re:rank scheme="http://stackoverflow.com">-1</re:rank>
+        <title type="text">spark saveAsNewAPIHadoopFile</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+        <author>
+            <name>T.B</name>
+            <uri>http://stackoverflow.com/users/5486767</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33334053/spark-saveasnewapihadoopfile" />
+        <published>2015-10-25T19:25:53Z</published>
+        <updated>2015-10-25T19:27:35Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am trying to run an app where I want to save my rdd into an avro file. &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rdd.map((kv: KeyValue) ⇒
+       (new AvroKey[K](kv._1), new AvroValue[V](kv._2))).saveAsNewAPIHadoopFile(&quot;file:///C:\\path\\toMy\\file.avro&quot;,
+         classOf[AvroKey[K]],
+         classOf[AvroValue[V]],
+         classOf[AvroKeyValueOutputFormat[K, V]], jobConfiguration
+       )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When I ran it the first time, I get a NPE. The second time, I am getting a &quot;FileAlreadyExistsException&quot;.&lt;/p&gt;
+
+&lt;p&gt;What is wrong here ?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33333669</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Deserialize thrift in Scala?</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="thrift" />
+            <category scheme="http://stackoverflow.com/tags" term="scrooge" />
+            <category scheme="http://stackoverflow.com/tags" term="spindle" />
+        <author>
+            <name>drozzy</name>
+            <uri>http://stackoverflow.com/users/74865</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33333669/deserialize-thrift-in-scala" />
+        <published>2015-10-25T18:54:36Z</published>
+        <updated>2015-10-25T18:54:36Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Can someone provide me with an example (in code) of how to deserialize thift encoded message in Scala 2.11.7?&lt;/p&gt;
+
+&lt;p&gt;I&#39;ve looked at spindle (seems like they don&#39;t have 2.11 library). Looked at &quot;scrooge&quot; but I have no idea &lt;em&gt;how&lt;/em&gt; to use it. There is no example of the actual &lt;em&gt;deserialization&lt;/em&gt; call.&lt;/p&gt;
+
+&lt;p&gt;In the end I want to know:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;What is the current scala up-to-date library for working with Thrift?&lt;/li&gt;
+&lt;li&gt;How do I generate Scala classes from thrift protocol specification file?&lt;/li&gt;
+&lt;li&gt;How do I deserialize a thrift encoded messages?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;P.S.: I&#39;m encoding my files in python and sending them over the network.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33333650</id>
+        <re:rank scheme="http://stackoverflow.com">2</re:rank>
+        <title type="text">How to make fully functional immutable classes in Scala?</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="copy" />
+            <category scheme="http://stackoverflow.com/tags" term="prototype" />
+        <author>
+            <name>Michael Lafayette</name>
+            <uri>http://stackoverflow.com/users/4993125</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33333650/how-to-make-fully-functional-immutable-classes-in-scala" />
+        <published>2015-10-25T18:53:01Z</published>
+        <updated>2015-10-25T19:40:58Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I noticed that Scala has case classes. These appear to be for pattern matching, but I like that I can do this with them:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;val bankAccount1 = new BankAccount(&quot;Daniel&quot;, 100)
+val bankAccount2 = bankAccount1.copy(funds = 200)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now &quot;Daniel&quot; has two bank accounts, one with $100 and one with $200. But when things get more complicated, &lt;code&gt;BankAccount&lt;/code&gt; needs to be sub-classed and this doesn&#39;t work because case classes can&#39;t extend other case classes. &lt;/p&gt;
+
+&lt;p&gt;I want immutable classes than can be extended into more immutable classes. Like I want to be able to extend &lt;code&gt;BankAccount&lt;/code&gt; to have immutable sub-classes &lt;code&gt;SavingsBankAccount&lt;/code&gt; and &lt;code&gt;CheckingBankAccount&lt;/code&gt;. I&#39;m not sure if at this point I need to extend/implement the &lt;code&gt;Clonable&lt;/code&gt; interface or define custom copy methods or something like that. I don&#39;t want to have to put too much boilerplate in the classes.&lt;/p&gt;
+
+&lt;p&gt;(If possible), how do I make immutable classes in Scala that can be copied and sub-classed and that aren&#39;t overly messy or verbose?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33333208</id>
+        <re:rank scheme="http://stackoverflow.com">-2</re:rank>
+        <title type="text">Create Edges from Vertices with Spark</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+            <category scheme="http://stackoverflow.com/tags" term="spark-graphx" />
+        <author>
+            <name>Sonex</name>
+            <uri>http://stackoverflow.com/users/3366485</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33333208/create-edges-from-vertices-with-spark" />
+        <published>2015-10-25T18:13:38Z</published>
+        <updated>2015-10-25T21:01:02Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Lets say I have an array of vertices and I want to create edges from them in a way that each vertex connects to the next x vertices.
+x could have any integer value.
+Is there a way to do that with Spark?&lt;/p&gt;
+
+&lt;p&gt;This is what I have with Scala so far:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//array that holds the edges
+    var edges = Array.empty[Edge[Double]]
+    for(j &amp;lt;- 0 to vertices.size - 2) {
+      for(i &amp;lt;- 1 to x) {
+        if((j+i) &amp;lt; vertices.size) {
+          //add edge
+          edges = edges ++ Array(Edge(vertices(j)._1, vertices(j+i)._1, 1.0))
+          //add inverse edge, we want both directions
+          edges = edges ++ Array(Edge(vertices(j+i)._1, vertices(j)._1, 1.0))
+        }
+      }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;where vertices variable is an array of (Long, String). But the whole process is of course sequential.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33332773</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Run spark streaming example on ec2 cluster</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="amazon-ec2" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+            <category scheme="http://stackoverflow.com/tags" term="spark-streaming" />
+        <author>
+            <name>astiefel</name>
+            <uri>http://stackoverflow.com/users/3457762</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33332773/run-spark-streaming-example-on-ec2-cluster" />
+        <published>2015-10-25T17:35:17Z</published>
+        <updated>2015-10-25T17:35:17Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am trying to run the NetworkWordCount on a distributed EC2 cluster using netcat (my version of the code is below). However, even when I run &lt;code&gt;nc -lk 9999&lt;/code&gt; I still get the following error:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;15/10/25 17:32:09 ERROR ReceiverTracker: Deregistered receiver for stream 0: Restarting receiver with delay 2000ms: Error connecting to 127.0.0.1:9999 - java.net.ConnectException: Connection refused
+    at java.net.PlainSocketImpl.socketConnect(Native Method)
+    at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+    at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+    at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+    at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+    at java.net.Socket.connect(Socket.java:579)
+    at java.net.Socket.connect(Socket.java:528)
+    at java.net.Socket.&amp;lt;init&amp;gt;(Socket.java:425)
+    at java.net.Socket.&amp;lt;init&amp;gt;(Socket.java:208)
+    at org.apache.spark.streaming.dstream.SocketReceiver.receive(SocketInputDStream.scala:73)
+    at org.apache.spark.streaming.dstream.SocketReceiver$$anon$2.run(SocketInputDStream.scala:59)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;My code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  def main(args: Array[String]) {
+    StreamLogger.setStreamingLogLevels()
+
+    // Create the context with a 1 second batch size
+    val sparkConf = new SparkConf().setAppName(&quot;NetworkWordCount&quot;)
+    val ssc = new StreamingContext(sparkConf, Seconds(2))
+
+    // Create a socket stream on target ip:port and count the
+    // words in input stream of \n delimited text (eg. generated by &#39;nc&#39;)
+    // Note that no duplication in storage level only for running locally.
+    // Replication necessary in distributed scenario for fault tolerance.
+    val lines = ssc.socketTextStream(&quot;127.0.0.1&quot;, 9999)
+    val words = lines.flatMap(_.split(&quot; &quot;))
+    val wordCounts = words.map(x =&amp;gt; (x, 1)).reduceByKey(_ + _)
+    wordCounts.print()
+
+    sys.ShutdownHookThread {
+      ssc.stop(true, true)
+    }
+
+    ssc.start()
+    ssc.awaitTermination()
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I am using Spark 1.5.0 and using the following command&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;./bin/spark-submit --master spark://ec2-52-91-149-156.compute-1.amazonaws.com:7077 --class main.java.Streamer ~/streaming-project-1.0-jar-with-dependencies.jar
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33332501</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">scala , my generic function &quot;findFirst &quot;does work</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="templates" />
+            <category scheme="http://stackoverflow.com/tags" term="generics" />
+            <category scheme="http://stackoverflow.com/tags" term="functional-programming" />
+        <author>
+            <name>BufBills</name>
+            <uri>http://stackoverflow.com/users/2495795</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33332501/scala-my-generic-function-findfirst-does-work" />
+        <published>2015-10-25T17:09:17Z</published>
+        <updated>2015-10-25T17:12:30Z</updated>
+        <summary type="html">
+            
+
+            &lt;pre&gt;&lt;code&gt;object FPSEx2_1 {
+
+    def factorial(n: Int) : Int = {
+        def go(n: Int, acc: Int) : Int = {
+            if (n &amp;lt;= 0) acc
+            else go(n-1, n*acc)
+        }
+        go(n, 1)
+    }
+    def fib(n: Int) : Int = {
+        @annotation.tailrec
+        def go(n:Int, prev: Int, cur: Int): Int = {
+            if( n == 0) prev
+            else go(n-1, cur, prev + cur)
+        }
+        go(n, 0,1)
+    }
+    def formatResult(name: String, n: Int, f:Int =&amp;gt; Int) = {
+        val msg = &quot;The %s of %d is %d.&quot;
+        msg.format(name, n, f(n))
+    }
+
+    def findFirst[A] (as: Array[A], p: A =&amp;gt; Boolean): Int = {
+        @annotation.tailrec
+        def loop(n: Int) : Int = 
+            if (n &amp;lt;= as.length) -1
+            else if (p(as(n))) n
+            else loop(n + 1)
+        loop(0)
+    }
+
+    def isPear(p : String) : Boolean = {
+        if (p == &quot;pears&quot;) true
+        else false
+    }
+
+    def main(args: Array[String]) : Unit = {
+        println(&quot;hello word&quot;)
+        println(factorial(3))
+        println(fib(4))
+        println(formatResult(&quot;factorial&quot;, 4, factorial))
+
+        var fruit = Array(&quot;apples&quot;, &quot;oranges&quot;, &quot;pears&quot;)
+
+        println(findFirst(fruit, isPear))  // ===&amp;gt; this line prins -1, why it does not work?
+    }
+}
+
+
+
+        println(findFirst(fruit, isPear))  // ===&amp;gt; this line prins -1, why it does not work?
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33332320</id>
+        <re:rank scheme="http://stackoverflow.com">-2</re:rank>
+        <title type="text">Reading and parsing a JSON in scala [on hold]</title>
+            <category scheme="http://stackoverflow.com/tags" term="json" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="parsing" />
+        <author>
+            <name>mel</name>
+            <uri>http://stackoverflow.com/users/4363810</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33332320/reading-and-parsing-a-json-in-scala" />
+        <published>2015-10-25T16:52:40Z</published>
+        <updated>2015-10-25T17:31:45Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I&#39;m really new to the scala language but I need to work with it in order to be able to work with Spark, so I&#39;m trying to do some short exercice. I got a json file including plenty of data &lt;a href=&quot;https://data.sfgov.org/Public-Safety/SFPD-Incidents-from-1-January-2003/tmnf-yvry&quot; rel=&quot;nofollow&quot;&gt;The data that I want to use&lt;/a&gt;. I want to read this file and parse it&#39;s data and be able to do some basic statistic about this dataset. So if you got some example where I can see how to read and parse properly a json file in scala it would help me a lot.&lt;/p&gt;
+
+&lt;p&gt;I succeed to read my file as a string, but I don&#39;t really know what to do with it know.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    val data = scala.io.Source.fromFile(&quot;data/SFPD.json&quot;).mkString
+print(&quot;In memory&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33332193</id>
+        <re:rank scheme="http://stackoverflow.com">-1</re:rank>
+        <title type="text">Configure scala&#39;s eclipse IDE to run hadoop mapreduce programs</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="hadoop" />
+            <category scheme="http://stackoverflow.com/tags" term="mapreduce" />
+        <author>
+            <name>Thulasi Accot</name>
+            <uri>http://stackoverflow.com/users/5148205</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33332193/configure-scalas-eclipse-ide-to-run-hadoop-mapreduce-programs" />
+        <published>2015-10-25T16:40:36Z</published>
+        <updated>2015-10-25T16:40:36Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Hi I need to run the mapreduce programs in scala using Eclipse IDE. I done the same using java eclipse where i loaded the extenal jar files from hadoop installation folder. For running scala programs which files i need to download and load into the eclipse project?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33331916</id>
+        <re:rank scheme="http://stackoverflow.com">-1</re:rank>
+        <title type="text">How to set scala-spark enviroment in notebook</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+            <category scheme="http://stackoverflow.com/tags" term="jupyter" />
+        <author>
+            <name>Young Pang</name>
+            <uri>http://stackoverflow.com/users/5486260</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33331916/how-to-set-scala-spark-enviroment-in-notebook" />
+        <published>2015-10-25T16:15:14Z</published>
+        <updated>2015-10-25T16:15:14Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;In our lab with a cluster, I had used pyspark on jupyter notebook, that is wonderful. 
+Now I find scala2.10.4(spark1.4.1) used on &lt;a href=&quot;https://try.jupyter.org/&quot; rel=&quot;nofollow&quot;&gt;https://try.jupyter.org/&lt;/a&gt;. 
+I want it!&lt;/p&gt;
+
+&lt;p&gt;But I can not find a nice doc. Can you teach me how to set it? A doc online is also of great use for me.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33330375</id>
+        <re:rank scheme="http://stackoverflow.com">1</re:rank>
+        <title type="text">How to write a function that returns something of the type `=&gt; Int`?</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+        <author>
+            <name>qed</name>
+            <uri>http://stackoverflow.com/users/562222</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33330375/how-to-write-a-function-that-returns-something-of-the-type-int" />
+        <published>2015-10-25T13:44:32Z</published>
+        <updated>2015-10-25T14:15:58Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I know a function can receive an arg of the type &lt;code&gt;=&amp;gt; A&lt;/code&gt; as in &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;def add1(x: =&amp;gt; Int): Int = {
+  x + 1
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But how do you return such a type in a function?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33330053</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">wrong number of type arguments for slick.driver.H2Driver.api.Table, should be 1</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="playframework" />
+            <category scheme="http://stackoverflow.com/tags" term="slick" />
+        <author>
+            <name>ZvL</name>
+            <uri>http://stackoverflow.com/users/2060754</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33330053/wrong-number-of-type-arguments-for-slick-driver-h2driver-api-table-should-be-1" />
+        <published>2015-10-25T13:08:54Z</published>
+        <updated>2015-10-25T15:04:19Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Using Play framework 2.4.3, and Slick 3.1&lt;/p&gt;
+
+&lt;p&gt;I have the following Model:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package models
+
+import slick.driver.H2Driver.simple._
+import slick.driver.H2Driver.api.Table
+import slick.lifted.Tag
+
+case class Subject(name: String, description: String)
+
+/* Table mapping
+ */
+class SubjectsTable(tag: Tag) extends Table[Subject](tag, &quot;SUBJECT&quot;) {
+
+  def name = column[String](&quot;name&quot;, O.PrimaryKey)
+
+  def description = column[String](&quot;description&quot;, O.NotNull)
+
+  def * = (name, description) &amp;lt;&amp;gt;(Subject.tupled, Subject.unapply _)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And I get a load of errors, that are rather unclear. The amount of errors clearly implies that I&#39;ve used an outdated tutorial to copy the structure of my Model class from (my Manning Play for Scala book also does not cover this..) or just wrong imports.. I can&#39;t find any solid tutorial online for using Slick with Play Framework, is this really all Play has to offer?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[error] /app/models/Subject.scala:3: value simple is not a member of object slick.driver.H2Driver
+[error] import slick.driver.H2Driver.simple._
+[error]                              ^
+[error] /app/controllers/Subjects.scala:25: type arguments [controllers.Subjects] conform to the bounds of none of the overloaded alternatives of
+[error]  value apply: [E &amp;lt;: slick.lifted.AbstractTable[_]]=&amp;gt; slick.lifted.TableQuery[E] &amp;lt;and&amp;gt; [E &amp;lt;: slick.lifted.AbstractTable[_]](cons: slick.lifted.Tag =&amp;gt; E)slick.lifted.TableQuery[E]
+[error]   val subjects: TableQuery[Subjects] = TableQuery[Subjects]
+[error]                                        ^
+[error] /app/controllers/Subjects.scala:34: value all is not a member of slick.lifted.TableQuery[controllers.Subjects]
+[error]     val allSubjects = dbConfig.db.run(subjects.all())
+[error]                                                ^
+[error] /app/models/Subject.scala:13: could not find implicit value for parameter tt: slick.ast.TypedType[String]
+[error]   def name = column[String](&quot;name&quot;, O.PrimaryKey)
+[error]                            ^
+[error] /app/models/Subject.scala:15: value NotNull is not a member of slick.driver.H2Driver.ColumnOptions
+[error]   def description = column[String](&quot;description&quot;, O.NotNull)
+[error]                                                     ^
+[error] /app/models/Subject.scala:15: could not find implicit value for parameter tt: slick.ast.TypedType[String]
+[error]   def description = column[String](&quot;description&quot;, O.NotNull)
+[error]                                   ^
+[error] /app/tables/Subjects.scala:7: wrong number of type arguments for slick.driver.H2Driver.api.Table, should be 1
+[error] class Subjects(tag: Tag) extends Table[String, String](tag, &quot;SUBJECTS&quot;) {
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I tried to use the file from a tutorial &lt;a href=&quot;https://github.com/loicdescotte/activator-play-slick/blob/master/app/models/Cat.scala&quot; rel=&quot;nofollow&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Something like a link to a tutorial or Github project is also fine if my question is too broad. I just can&#39;t start developing a sensible application like this. (Please don&#39;t refer to the Play Framework docs, they don&#39;t provide any proper info regarding this)&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33330014</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Scala erasure in pattern matching</title>
+            <category scheme="http://stackoverflow.com/tags" term="json" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="parsing" />
+            <category scheme="http://stackoverflow.com/tags" term="pattern-matching" />
+            <category scheme="http://stackoverflow.com/tags" term="erasure" />
+        <author>
+            <name>frank_neff</name>
+            <uri>http://stackoverflow.com/users/1045760</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33330014/scala-erasure-in-pattern-matching" />
+        <published>2015-10-25T13:03:57Z</published>
+        <updated>2015-10-25T13:39:37Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have to extract information of a JSON response and evaluate if some file dis present or not. I&#39;m using the following method definition:&lt;/p&gt;
+
+&lt;pre class=&quot;lang-scala prettyprint-override&quot;&gt;&lt;code&gt;override def hasField(field: Field): Boolean = {
+  val schema = parse(httpClient.doGet(url + Solr5EndpointUris.schemaOverviewEndpoint)).extract[Map[String, Any]]
+
+  val fieldsNames: List[String] = schema.get(&quot;schema&quot;) match {
+    case schema: Some[Map[String, Any]] =&amp;gt; schema.get(if (field.dynamic) &quot;dynamicFields&quot; else &quot;fields&quot;) match {
+      case fields: List[Map[String, Any]] =&amp;gt; fields.map {
+        case field: Map[String, Any] =&amp;gt; field.get(&quot;name&quot;) match {
+          case name: Some[String] =&amp;gt; name.getOrElse(&quot;&quot;)
+        }
+      }
+      case _ =&amp;gt; throw new ApiException(&quot;Malformed Response! Missing definition for schema &amp;gt; fields/dynamicFields.&quot;)
+    }
+    case _ =&amp;gt; throw new ApiException(&quot;Malformed Response! Could not extract schema from JSON.&quot;)
+  }
+
+  fieldsNames.contains(field.name)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The method inspects the JSON response via pattern matching and should return true if a field with specific name is present. An example JSON response could be the following:&lt;/p&gt;
+
+&lt;pre class=&quot;lang-js prettyprint-override&quot;&gt;&lt;code&gt;{
+  &quot;responseHeader&quot;:{
+  &quot;status&quot;:0,
+  &quot;QTime&quot;:2},
+  &quot;schema&quot;:{
+    &quot;name&quot;:&quot;example-data-driven-schema&quot;,
+    &quot;version&quot;:1.5,
+    &quot;uniqueKey&quot;:&quot;id&quot;,
+    &quot;fieldTypes&quot;:[],
+    &quot;fields&quot;:[{
+      &quot;name&quot;:&quot;id&quot;,
+      &quot;type&quot;:&quot;string&quot;,
+      &quot;multiValued&quot;:false,
+      &quot;indexed&quot;:true,
+      &quot;required&quot;:true,
+      &quot;stored&quot;:true}],
+    &quot;dynamicFields&quot;:[],
+    &quot;copyFields&quot;:[]
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This implementations does work, but i&#39;m pretty sure there is a more straight forward / less complex implementation to achieve this. Also i get many warnings like the following:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;SchemaManager.scala:38: non-variable type argument Map[String,Any] in type pattern Some[Map[String,Any]] is unchecked since it is eliminated by erasure&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Can anyone provide a better solution, and / or explain the warnings i get?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33329494</id>
+        <re:rank scheme="http://stackoverflow.com">4</re:rank>
+        <title type="text">Spark JoinWithCassandraTable on TimeStamp partition key STUCK</title>
+            <category scheme="http://stackoverflow.com/tags" term="mysql" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="cassandra" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+            <category scheme="http://stackoverflow.com/tags" term="datastax-enterprise" />
+        <author>
+            <name>Rada</name>
+            <uri>http://stackoverflow.com/users/2552806</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33329494/spark-joinwithcassandratable-on-timestamp-partition-key-stuck" />
+        <published>2015-10-25T12:08:45Z</published>
+        <updated>2015-10-25T12:08:45Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I&#39;m trying to filter on a small part of a huge C* table by using:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    val snapshotsFiltered = sc.parallelize(startDate to endDate).map(TableKey(_)).joinWithCassandraTable(&quot;listener&quot;,&quot;snapshots_tspark&quot;)
+
+    println(&quot;Done Join&quot;)
+    //*******
+    //get only the snapshots and create rdd temp table
+    val jsons = snapshotsFiltered.map(_._2.getString(&quot;snapshot&quot;))
+    val jsonSchemaRDD = sqlContext.jsonRDD(jsons)
+    jsonSchemaRDD.registerTempTable(&quot;snapshots_json&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    case class TableKey(created: Long) //(created, imei, when)--&amp;gt; created = partititon key | imei, when = clustering key
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And the cassandra table schema is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;CREATE TABLE listener.snapshots_tspark (
+created timestamp,
+imei text,
+when timestamp,
+snapshot text,
+PRIMARY KEY (created, imei, when) ) WITH CLUSTERING ORDER BY (imei ASC, when ASC)
+AND bloom_filter_fp_chance = 0.01
+AND caching = &#39;{&quot;keys&quot;:&quot;ALL&quot;, &quot;rows_per_partition&quot;:&quot;NONE&quot;}&#39;
+AND comment = &#39;&#39;
+AND compaction = {&#39;min_threshold&#39;: &#39;4&#39;, &#39;class&#39;: &#39;org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy&#39;, &#39;max_threshold&#39;: &#39;32&#39;}
+AND compression = {&#39;sstable_compression&#39;: &#39;org.apache.cassandra.io.compress.LZ4Compressor&#39;}
+AND dclocal_read_repair_chance = 0.1
+AND default_time_to_live = 0
+AND gc_grace_seconds = 864000
+AND max_index_interval = 2048
+AND memtable_flush_period_in_ms = 0
+AND min_index_interval = 128
+AND read_repair_chance = 0.0
+AND speculative_retry = &#39;99.0PERCENTILE&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem is that the process freezes after the println done with no errors on spark master ui.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[Stage 0:&amp;gt;                                                                                                                                (0 + 2) / 2]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Won`t the Join work with timestamp as the partition key? Why it freezes?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33329171</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">lookup rdd where keys are from different rdd</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+        <author>
+            <name>sri hari kali charan Tummala</name>
+            <uri>http://stackoverflow.com/users/4035861</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33329171/lookup-rdd-where-keys-are-from-different-rdd" />
+        <published>2015-10-25T11:29:41Z</published>
+        <updated>2015-10-25T12:03:30Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am having difficulty in looking up value from a RDD where keys come from a different RDD.
+I need to convert RDD of topsuperhero array[Int] to plain string then I can pass to namesmap.lookup rdd.&lt;/p&gt;
+
+&lt;p&gt;How to convert array of [Int] to plain string ? do I need to write a function ?&lt;/p&gt;
+
+
+
+&lt;pre&gt;&lt;code&gt;val names = sc.textFile(&quot;C:\\Users\\kalit_000\\Desktop\\udemy_spark\\marvelnames.txt&quot;)
+val namemap = names.map(x =&amp;gt; x.split(&quot; &quot;)).map(x =&amp;gt; (x(0),x(1)))
+
+val graph = sc.textFile(&quot;C:\\Users\\kalit_000\\Desktop\\udemy_spark\\marvelgraph.txt&quot;)
+val graphmap = graph.map(x =&amp;gt; x.split(&quot; &quot;)).map(x =&amp;gt; (x(0).toInt,(x.length -1).toInt))
+
+val totalfirendsBycharacter = graphmap.mapValues(x =&amp;gt; (x)).reduceByKey((x,y) =&amp;gt; x+y)
+val topsuperhero = totalfirendsBycharacter.sortBy(_._2,false).take(1)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Error:&lt;/strong&gt; 
+  topsuperhero is array[Int] which I need to convert to plain string how can I achieve this ?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;namemap.lookup(topsuperhero.map(x =&amp;gt; x._1)).foreach(println)
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33328923</id>
+        <re:rank scheme="http://stackoverflow.com">3</re:rank>
+        <title type="text">how to check whether given List[Int] is sorted in scala?</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+        <author>
+            <name>spk</name>
+            <uri>http://stackoverflow.com/users/4640256</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33328923/how-to-check-whether-given-listint-is-sorted-in-scala" />
+        <published>2015-10-25T11:03:07Z</published>
+        <updated>2015-10-25T19:54:39Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I would like to know whether is there any &lt;code&gt;isSorted()&lt;/code&gt; function exist or not in scala.&lt;/p&gt;
+
+&lt;p&gt;Question: check whether &lt;code&gt;List[Int]&lt;/code&gt; is sorted or not, If not remove smallest number and do again till &lt;code&gt;List[Int]&lt;/code&gt; become sorted?&lt;/p&gt;
+
+&lt;p&gt;I want only 1 or 2 line program.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33328296</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Spark streaming: task &quot;predict&quot; not serializable</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="serialization" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+            <category scheme="http://stackoverflow.com/tags" term="mllib" />
+        <author>
+            <name>Javier de la Rosa</name>
+            <uri>http://stackoverflow.com/users/5485541</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33328296/spark-streaming-task-predict-not-serializable" />
+        <published>2015-10-25T09:47:14Z</published>
+        <updated>2015-10-25T18:19:44Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am  trying to make a spark streaming program using a model to predict, but I get an error doing this: Task not serializable.&lt;/p&gt;
+
+&lt;p&gt;Code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;val model = sc.objectFile[DecisionTreeModel](&quot;DecisionTreeModel&quot;).first() 
+val parsedData = reducedData.map { line =&amp;gt;
+  val arr = Array(line._2._1,line._2._2,line._2._3,line._2._4,line._2._5,line._2._6,line._2._7,line._2._8,line._2._9,line._2._10,line._2._11)
+  val vector = LabeledPoint(line._2._4, Vectors.dense(arr))
+  model.predict(vector.features))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I paste the error:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;scala&amp;gt; val parsedData = reducedData.map { line =&amp;gt;
+     |     val arr = Array(line._2._1,line._2._2,line._2._3,line._2._4,line._2._5,line._2._6,line._2._7,line._2._8,line._2._9,line._2._10,line._2._11)
+     |     val vector=LabeledPoint(line._2._4, Vectors.dense(arr))
+     |     model.predict(vector.features)
+     | }
+org.apache.spark.SparkException: Task not serializable
+    at org.apache.spark.util.ClosureCleaner$.ensureSerializable(ClosureCleaner.scala:304)
+    at org.apache.spark.util.ClosureCleaner$.org$apache$spark$util$ClosureCleaner$$clean(ClosureCleaner.scala:294)
+    at org.apache.spark.util.ClosureCleaner$.clean(ClosureCleaner.scala:122)
+    at org.apache.spark.SparkContext.clean(SparkContext.scala:2030)
+    at org.apache.spark.streaming.dstream.DStream$$anonfun$map$1.apply(DStream.scala:528)
+    at org.apache.spark.streaming.dstream.DStream$$anonfun$map$1.apply(DStream.scala:528)
+    at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:147)
+    at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:108)
+    at org.apache.spark.SparkContext.withScope(SparkContext.scala:709)
+    at .......
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;How can I solve this issue?&lt;/p&gt;
+
+&lt;p&gt;Thanks!&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33328081</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Spark createStream error when creating a stream to decode byte arrays in IntelliJ using the Scala plugin</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="intellij-idea" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-kafka" />
+            <category scheme="http://stackoverflow.com/tags" term="spark-streaming" />
+        <author>
+            <name>user249425</name>
+            <uri>http://stackoverflow.com/users/3921323</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33328081/spark-createstream-error-when-creating-a-stream-to-decode-byte-arrays-in-intelli" />
+        <published>2015-10-25T09:20:05Z</published>
+        <updated>2015-10-25T09:20:05Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I&#39;m trying to modify the KafkaWordCount spark streaming example to take in a byte stream. This is my code so far : &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; def main(args: Array[String]) {
+ if (args.length &amp;lt; 4) {
+   System.err.println(&quot;Usage: KafkaWordCount &amp;lt;zkQuorum&amp;gt; &amp;lt;group&amp;gt; &amp;lt;topics&amp;gt; &amp;lt;numThreads&amp;gt;&quot;)
+   System.exit(1)
+ }
+
+ val Array(zkQuorum, group, topics, numThreads) = args
+ val sparkConf = new SparkConf().setAppName(&quot;SiMod&quot;).setMaster(&quot;local[2]&quot;)
+ val ssc = new StreamingContext(sparkConf, Seconds(2))
+ ssc.checkpoint(&quot;checkpoint&quot;)
+
+ var event: Event = null
+ val topicMap = topics.split(&quot;,&quot;).map((_, numThreads.toInt)).toMap
+ val lines = KafkaUtils.createStream[String, Array[Byte], DefaultDecoder, DefaultDecoder](ssc, zkQuorum, group, topicMap, StorageLevel.MEMORY_ONLY_SER)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last line - &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;val lines = KafkaUtils.createStream[String, Array[Byte], DefaultDecoder, DefaultDecoder](ssc, zkQuorum, group, topicMap, StorageLevel.MEMORY_ONLY_SER)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;is giving an error in IntelliJ, although as far as I can see my usage is the same as in other examples.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Error:(35, 41) overloaded method value createStream with alternatives:
+  (jssc: org.apache.spark.streaming.api.java.JavaStreamingContext,keyTypeClass:     Class[String],valueTypeClass: Class[Array[Byte]],keyDecoderClass: Class[kafka.serializer.DefaultDecoder],valueDecoderClass: Class[kafka.serializer.DefaultDecoder],kafkaParams: java.util.Map[String,String],topics: java.util.Map[String,Integer],storageLevel: org.apache.spark.storage.StorageLevel)org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream[String,Array[Byte]] &amp;lt;and&amp;gt;
+(ssc: org.apache.spark.streaming.StreamingContext,kafkaParams: scala.collection.immutable.Map[String,String],topics: scala.collection.immutable.Map[String,Int],storageLevel: org.apache.spark.storage.StorageLevel)(implicit evidence$1: scala.reflect.ClassTag[String], implicit evidence$2: scala.reflect.ClassTag[Array[Byte]], implicit evidence$3: scala.reflect.ClassTag[kafka.serializer.DefaultDecoder], implicit evidence$4: scala.reflect.ClassTag[kafka.serializer.DefaultDecoder])org.apache.spark.streaming.dstream.ReceiverInputDStream[(String, Array[Byte])]
+cannot be applied to (org.apache.spark.streaming.StreamingContext, String, String, scala.collection.immutable.Map[String,Int])
+ val lines = KafkaUtils.createStream[String, Array[Byte], DefaultDecoder, DefaultDecoder](ssc, zkQuorum, group, topicMap)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What can I do about this?                                    &lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33327431</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Using org.slf4j.Marker with ActorLogging</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="akka" />
+            <category scheme="http://stackoverflow.com/tags" term="slf4j" />
+            <category scheme="http://stackoverflow.com/tags" term="logback" />
+        <author>
+            <name>Eli Golin</name>
+            <uri>http://stackoverflow.com/users/3359553</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33327431/using-org-slf4j-marker-with-actorlogging" />
+        <published>2015-10-25T07:52:09Z</published>
+        <updated>2015-10-25T08:08:09Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have the need to use log markers (org.slf4j.Marker) when my actors perform logging.
+I am using logback as a logging library, and just as a general practice suggests all my actors are mixing in a LoggingActor trait which enables the logging functionality.&lt;/p&gt;
+
+&lt;p&gt;I guess since my actors don&#39;t use the slf4j facade, then I can not use the the markers when I perform logging.&lt;/p&gt;
+
+&lt;p&gt;Is there a way to be able doing something like: log.info(myMarker,&quot;My logging message..&quot;) ??
+Or maybe some other alternative?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33327429</id>
+        <re:rank scheme="http://stackoverflow.com">1</re:rank>
+        <title type="text">Trying to create a Scala immutable List from and return in method of another type</title>
+            <category scheme="http://stackoverflow.com/tags" term="list" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="constructor" />
+            <category scheme="http://stackoverflow.com/tags" term="immutability" />
+        <author>
+            <name>jeffkozlow</name>
+            <uri>http://stackoverflow.com/users/5478451</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33327429/trying-to-create-a-scala-immutable-list-from-and-return-in-method-of-another-typ" />
+        <published>2015-10-25T07:51:46Z</published>
+        <updated>2015-10-25T16:12:06Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am trying to return &lt;code&gt;ComputingMethod&lt;/code&gt; as a (preferably immutable) &lt;code&gt;List&lt;/code&gt;. I think I want to declare it as an empty list in a separate constructor but I&#39;m not exactly sure how to begin or where to go thereafter.
+A simplified version of the code slice I have is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class MyComputingMethod extends ComputingMethod{
+   override def execute(o: Vector[Object]): ComputingMethod = {
+      val wc = List[Object]() 
+      for(i&amp;lt;-o.indices)
+         wc::(o(i))                          //put vector objects in vector
+      wc
+   }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;ComputingMethod&lt;/code&gt; is a trait that defines the &lt;code&gt;execute&lt;/code&gt; method. I&#39;ve declared &lt;code&gt;Object&lt;/code&gt; in another class. So I want to return a &lt;code&gt;ComputingMethod&lt;/code&gt; object but I need &lt;code&gt;ComputingMethod&lt;/code&gt; to be a &lt;code&gt;List&lt;/code&gt;. I&#39;m not even sure if &lt;code&gt;List&lt;/code&gt; should be declared as generic or as a list of &lt;code&gt;Object&lt;/code&gt; (or as a &lt;code&gt;Vector&lt;/code&gt; of &lt;code&gt;Object&lt;/code&gt;s). &lt;/p&gt;
+
+&lt;p&gt;Things I&#39;ve tried:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;object MyComputingMethod {
+   val mcm = List[Object]()                      //declaring outside class
+   type ComputingMethod = List[Object]           //also tried within class
+   val mc = new ComputingMethod().mcm            
+   /*the above doesn&#39;t allow me to use any of the List operations, 
+   although mc is of type VirtualMachine, 
+   but the &#39;mcm&#39; list doesn&#39;t seem connected */
+}
+
+class MyComputingMethod extends ComputingMethod{
+   val mcm = List()                              //declaring outside def
+   def mCm : MyComputingMethod = List()          //def rather than val, shot in the dark
+   override def execute(o: Vector[Object): ComputingMethod = {
+      val wc = List[Object]() 
+      for(i&amp;lt;-o.indices)
+         mCm.wc::(o(i))              //put vector objects in vector
+      mCm.wc                        //attempt to return ComputingMethod List
+   }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So I think what I I need to do is create a generic constructor (and a private?) for MyComputingMethod that within it initializes an empty list that I can use as a MyComputingMethod object, But I am unsure how to do this.
+Any suggestions are much appreciated.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33327411</id>
+        <re:rank scheme="http://stackoverflow.com">2</re:rank>
+        <title type="text">How to find a parent actor in scala akka</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="akka" />
+            <category scheme="http://stackoverflow.com/tags" term="actor" />
+        <author>
+            <name>Chen Chen</name>
+            <uri>http://stackoverflow.com/users/5310949</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33327411/how-to-find-a-parent-actor-in-scala-akka" />
+        <published>2015-10-25T07:49:50Z</published>
+        <updated>2015-10-25T20:46:39Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am using scala akka actor model. I have a parent actor create n child actors. Child actors first talk with each other and then report the answer to the master actor. But I could not make it work for the report part. The code structure is as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class Master(n:Int) extends Actor{
+    val system =ActorSystem(&quot;mysystem&quot;)
+    for(i &amp;lt;- 1 to n){
+        val child=system.actorOf(Props(new Node),name=i.toString) 
+    }
+    ... code let child actor talk with each other ...
+    def receive={
+        case _=&amp;gt;&quot;received&quot;
+    }
+}
+class Node extends Actor{
+    def receive={
+        case =&amp;gt; ... some code talking with each other...
+                var master=context.actorSelection(&quot;../Master&quot;)
+                master ! &quot;talk back to master&quot;
+    } 
+}
+def main() {
+    val Master=system.actorOf(Props(new Master(10)),name=&quot;Master&quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33326855</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Dealing with Closures and Futures in Scala</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="closures" />
+            <category scheme="http://stackoverflow.com/tags" term="future" />
+        <author>
+            <name>sparkr</name>
+            <uri>http://stackoverflow.com/users/3102968</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33326855/dealing-with-closures-and-futures-in-scala" />
+        <published>2015-10-25T06:25:10Z</published>
+        <updated>2015-10-25T07:38:27Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have the following method that does some handling with &lt;code&gt;Future&lt;/code&gt;s:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;def registerNewUser(user: User): Future[Either[ServiceError, User]] = async {
+  val encryptedUser =
+    user.copy(encrypt(user))
+
+  def checkResultAndFetchUser(result: WriteResult, encryptedEmail: String): Future[Either[ServiceError, User]] = {
+    if (result.hasErrors)
+      Future.successful(Left(ServiceError(result.writeErrors.map(_.errmsg).toString)))
+    else
+      userByEmail(encryptedEmail)
+  }
+
+  def handleInsertError(result: WriteResult): Either[ServiceError, User] = {
+    if (result.code contains 11000)
+      Left(ServiceError(&quot;Email already exists&quot;))
+    else
+      Left(ServiceError(result.writeErrors.map(_.errmsg).toString))
+  }
+
+  val result = userCollection.insert(encryptedUser).map( writeRes =&amp;gt;
+    checkResultAndFetchUser(writeRes, encryptedUser.email)
+  ).recover {
+    case res: WriteResult =&amp;gt; Future.successful(handleInsertError(res))
+  }
+
+  await(result.flatMap(fut =&amp;gt; fut))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here are my questions:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;The &lt;code&gt;encryptedUser&lt;/code&gt; local variable is being used in the &lt;code&gt;checkResultAndFetchUser&lt;/code&gt; method, the &lt;code&gt;userCollection.insert(encryptedUser)&lt;/code&gt; returns a &lt;code&gt;Future&lt;/code&gt;, so is there any chance that another &lt;code&gt;encryptedUser&lt;/code&gt; might be captured in the &lt;code&gt;checkResultAndFetchUser&lt;/code&gt; method? That would mean, I&#39;m doomed!&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Is this a good way of dealing with &lt;code&gt;Future&lt;/code&gt;s and its handling?&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33326342</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Can&#39;t authenticate properly with Chef API</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="http" />
+            <category scheme="http://stackoverflow.com/tags" term="authentication" />
+            <category scheme="http://stackoverflow.com/tags" term="chef" />
+            <category scheme="http://stackoverflow.com/tags" term="rsa" />
+        <author>
+            <name>Liam</name>
+            <uri>http://stackoverflow.com/users/1045017</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33326342/cant-authenticate-properly-with-chef-api" />
+        <published>2015-10-25T04:57:48Z</published>
+        <updated>2015-10-25T04:57:48Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have been attempting to put together a Scala library for making calls to Chef APIs but I keep getting this problem with authenticating the API calls.&lt;/p&gt;
+
+&lt;p&gt;I have triple checked and the private key is correct and all other headers. The code I am using is here: &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/LiamHaworth/shef/blob/master/src/main/scala/au/id/haworth/shef/ChefUtils.scala&quot; rel=&quot;nofollow&quot;&gt;https://github.com/LiamHaworth/shef/blob/master/src/main/scala/au/id/haworth/shef/ChefUtils.scala&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;and I am calling it like so&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import au.id.haworth.shef.{RequestMethod, ChefUtils}
+import au.id.haworth.shef.ChefServer
+
+val key = io.Source.fromFile(&quot;user.pem&quot;).getLines.mkString(&quot;\n&quot;)
+
+val chefServer = ChefServer(&quot;chef.example.com&quot;, 443, &quot;https&quot;, &quot;myorg&quot;, &quot;myuser&quot;, key)
+
+ChefUtils.sendRequestToServer(chefServer, RequestMethod.GET, &quot;&quot;, &quot;&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But I keep on getting this response from the server&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;&quot;{&quot;error&quot;:[&quot;Invalid signature for user or client &#39;myuser&#39;&quot;]}&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;I am sure that the problem is simple and is staring me in the face but I can&#39;t see it so any help will be greatly appreciated &lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33325902</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Read and write massive text files in scala</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+        <author>
+            <name>warbaque</name>
+            <uri>http://stackoverflow.com/users/2710225</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33325902/read-and-write-massive-text-files-in-scala" />
+        <published>2015-10-25T03:34:41Z</published>
+        <updated>2015-10-25T18:39:27Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;How should I read and write massive text files in scala, avoiding crashes due huge memory requirements?&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;example case&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;input file has 3 million strings, and the following code obviously crashes&lt;/p&gt;
+
+&lt;pre class=&quot;lang-scala prettyprint-override&quot;&gt;&lt;code&gt;// The first line of the file contains input data type and total number of lines
+
+  val src = Source.fromFile(&quot;in.txt&quot;).getLines
+  val header = src.next.split(&quot; &quot;).toVector
+  val lines = (if (header(0) == &quot;i&quot;) src.map(_.toInt) else src).toArray
+
+  process(lines) // no lines are removed during processing
+
+  val writer = new PrintWriter(&quot;out.txt&quot;, &quot;UTF-8&quot;)
+  try writer.print(lines.mkString(&quot;\n&quot;))
+  finally writer.close
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;How should I&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;split data into chunks (and how to decide individual chunk size?)&lt;/li&gt;
+&lt;li&gt;process chunks&lt;/li&gt;
+&lt;li&gt;merge chunks&lt;/li&gt;
+&lt;li&gt;write an output file&lt;/li&gt;
+&lt;/ul&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33325403</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">How to programmatically fail scalatest from another thread</title>
+            <category scheme="http://stackoverflow.com/tags" term="multithreading" />
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="scalatest" />
+        <author>
+            <name>ayvango</name>
+            <uri>http://stackoverflow.com/users/837133</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33325403/how-to-programmatically-fail-scalatest-from-another-thread" />
+        <published>2015-10-25T01:59:47Z</published>
+        <updated>2015-10-25T01:59:47Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;As far as I know all assert methods throws exceptions that are handled by the test runner. I&#39;m testing mutlithread application and would like to pass errors from spawned threads to the runner. I understand that runner could not interrupt threads, so I would shutdown them manually. But I would like to mark the test as failed.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33324139</id>
+        <re:rank scheme="http://stackoverflow.com">2</re:rank>
+        <title type="text">Scala Netty How to create a simple client for byte data based protocol?</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="netty" />
+        <author>
+            <name>autronix</name>
+            <uri>http://stackoverflow.com/users/1804658</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33324139/scala-netty-how-to-create-a-simple-client-for-byte-data-based-protocol" />
+        <published>2015-10-24T22:43:12Z</published>
+        <updated>2015-10-24T23:24:27Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;This Question is intended as a presentation of the problem that I have encountered while working on a current project. I will be answering below presenting my solution.&lt;/p&gt;
+
+&lt;p&gt;I am working on a project that requires me to connect to a data feed server that has a proprietary protocol to transfer data, essentially coded in the data section of the TCP protocol in GZIP format and needs to be extracted.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://gist.github.com/autronix/6c60e2dd7876845bc2ad&quot; rel=&quot;nofollow&quot;&gt;sample application&lt;/a&gt; for the data protocol from the data provider uses a simple socket in Java. I want to adapt it to scala/netty. Additionally, it is worth noting that the data provided may be spread over multiple packets.&lt;/p&gt;
+
+&lt;p&gt;I have been looking for simple and concise examples on how to use Netty.io to create a simple client application, but all examples seem overly complicated and lacked enough explanation to simply achieve this purpose.
+More importantly a lot of the netty/scala examples are oriented toward server applications.&lt;/p&gt;
+
+&lt;p&gt;The &quot;&lt;a href=&quot;http://netty.io/wiki/user-guide-for-4.x.html&quot; rel=&quot;nofollow&quot;&gt;Getting Started&lt;/a&gt;&quot; netty tutorial also lacks enough explanations to make it easy to navigate when actually getting started.&lt;/p&gt;
+
+&lt;p&gt;The question is, how to implement a simple netty application that connects to a server, receives the data and parses the results?&lt;/p&gt;
+
+&lt;p&gt;Here are some of the examples I have looked at in order to attempt understanding this concept:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/kxbmap/netty4-example-scala/tree/master/src/main/scala/com/github/kxbmap/netty/example/echo&quot; rel=&quot;nofollow&quot;&gt;Echo Client Handler&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/gsoltis/ScalaByTheBay/tree/master/src/main/scala/com/firebase/sbtb&quot; rel=&quot;nofollow&quot;&gt;Scala By The Bay example&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/33324110</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">get random rows from RDD</title>
+            <category scheme="http://stackoverflow.com/tags" term="scala" />
+            <category scheme="http://stackoverflow.com/tags" term="apache-spark" />
+        <author>
+            <name>javamonkey79</name>
+            <uri>http://stackoverflow.com/users/27657</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/33324110/get-random-rows-from-rdd" />
+        <published>2015-10-24T22:38:43Z</published>
+        <updated>2015-10-25T00:04:12Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am trying to get back N random rows from a sparkSQL RDD, something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sqlContext.sql(&quot;SELECT col FROM tablename&quot;).sample(true, .7, 98712).show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The .7 and 98712 are just junk numbers I&#39;m using to play with.&lt;/p&gt;
+
+&lt;p&gt;I&#39;m not really seeing random results and would like to know how to get some random rows back from an RDD?&lt;/p&gt;
+
+        </summary>
+    </entry>
+</feed>

@@ -34,4 +34,5 @@ object Allow {
   implicit val devAllowCat: Dev Allow Cat[Dev] = new Allow[Dev, Cat[Dev]]
   implicit val devAllowTail: Dev Allow Tail[Dev] = new Allow[Dev, Tail[Dev]]
   implicit val devAllowClear: Dev Allow Clear[Dev] = new Allow[Dev, Clear[Dev]]
+  implicit val devAllowGrep: Dev Allow Grep[Dev] = new Allow[Dev, Grep[Dev]]
 }
