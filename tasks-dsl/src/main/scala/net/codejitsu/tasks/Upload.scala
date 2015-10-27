@@ -27,9 +27,9 @@ final case class Upload[S <: Stage](target: Hosts,
     case h: HostLike =>
       val up: Process = "rsync" on Localhost ~> {
         case Start => if (usingSudo) {
-          Sudo ~ Exec(exec, "-avzhe", "ssh", source, s"${h.toString()}:$destinationPath")
+          Sudo ~ Exec(exec, List("-avzhe", "ssh", source, s"${h.toString()}:$destinationPath"))
         } else {
-          Exec(exec, "-avzhe", "ssh", source, s"${h.toString()}:$destinationPath")
+          Exec(exec, List("-avzhe", "ssh", source, s"${h.toString()}:$destinationPath"))
         }
       }
 

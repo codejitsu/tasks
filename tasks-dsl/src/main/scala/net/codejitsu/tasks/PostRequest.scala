@@ -34,9 +34,9 @@ final case class PostRequest[S <: Stage](hosts: Hosts, path: String, data: Strin
   private val tasks: collection.immutable.Seq[TaskM[Boolean]] = hosts.hosts.map { host =>
     val process = s"curl to ${host.toString()}:$port$path" on Localhost ~> {
       case Start => if (usingSudo) {
-        Sudo ~ Exec(exec, PostRequest.prepareParams(headers, data, host, path, port) :_*)
+        Sudo ~ Exec(exec, PostRequest.prepareParams(headers, data, host, path, port))
       } else{
-        Exec(exec, PostRequest.prepareParams(headers, data, host, path, port) :_*)
+        Exec(exec, PostRequest.prepareParams(headers, data, host, path, port))
       }
     }
 

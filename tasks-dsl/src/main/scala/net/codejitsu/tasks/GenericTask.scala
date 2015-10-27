@@ -12,9 +12,9 @@ abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: Strin
 
   protected val procs: Processes = name on hosts ~> {
     case cmd => if (usingSudo) {
-      Sudo ~ Exec(exec, params :_*)
+      Sudo ~ Exec(exec, params)
     } else {
-      Exec(exec, params :_*)
+      Exec(exec, params)
     }
   }
 

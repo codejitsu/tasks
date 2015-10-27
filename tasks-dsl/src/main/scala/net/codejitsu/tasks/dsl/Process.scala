@@ -54,11 +54,11 @@ sealed trait CommandLine {
   }
 }
 
-final case class Exec(path: String, params: String*) extends CommandLine {
+final case class Exec(path: String, params: List[String] = Nil) extends CommandLine {
   def args: Array[String] = params.toArray
 }
 
-final case class SudoExec(path: String, params: String*) extends CommandLine {
+final case class SudoExec(path: String, params: List[String] = Nil) extends CommandLine {
   def args: Array[String] = params.toArray
   override def cmd: Seq[String] = Seq("sudo", "-S") ++ super.cmd
 }

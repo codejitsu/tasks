@@ -34,9 +34,9 @@ final case class GetRequest[S <: Stage](hosts: Hosts, path: String,
   private val tasks: collection.immutable.Seq[TaskM[Boolean]] = hosts.hosts.map { host =>
     val process = s"curl to ${host.toString()}:$port$path" on Localhost ~> {
       case Start => if (usingSudo) {
-        Sudo ~ Exec(exec, GetRequest.prepareParams(host, path, port) :_*)
+        Sudo ~ Exec(exec, GetRequest.prepareParams(host, path, port))
       } else{
-        Exec(exec, GetRequest.prepareParams(host, path, port) :_*)
+        Exec(exec, GetRequest.prepareParams(host, path, port))
       }
     }
 

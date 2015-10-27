@@ -155,37 +155,37 @@ class DslTest extends FlatSpec with Matchers {
     val host = "my" ~ "test" ~ "host"
 
     val process: Process = "tomcat" on host ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     process.name should be ("tomcat")
-    process.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-    process.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+    process.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+    process.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
     process.host should be (host)
   }
 
   it should "allow to define process on simple host" in {
     val process: Process = "tomcat" on "my.test.host" ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     process.name should be ("tomcat")
-    process.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-    process.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+    process.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+    process.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
     process.host should be (Host(List(HostPart("my.test.host"))))
   }
 
   it should "allow to define process on localhost" in {
     val process: Process = "tomcat" on Localhost ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     process.name should be ("tomcat")
-    process.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-    process.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+    process.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+    process.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
     process.host should be (Localhost)
   }
 
@@ -193,8 +193,8 @@ class DslTest extends FlatSpec with Matchers {
     val hosts: Hosts = "my" ~ "test" ~ "host" ~ (1 to 10)
 
     val tomcats: Processes = "tomcat" on hosts ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     tomcats.procs.size should be (10)
@@ -203,8 +203,8 @@ class DslTest extends FlatSpec with Matchers {
 
     tomcats.procs.foreach { tomcat =>
       tomcat.name should be ("tomcat")
-      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
       tomcat.host.toString.startsWith("my.test.host") should be (true)
     }
   }
@@ -213,8 +213,8 @@ class DslTest extends FlatSpec with Matchers {
     val hosts = "my" ~ "test" ~ "host" ~ (1 to 10)
 
     val tomcats = "tomcat" on hosts ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     tomcats.procs.size should be (10)
@@ -223,8 +223,8 @@ class DslTest extends FlatSpec with Matchers {
 
     tomcats.procs.foreach { tomcat =>
       tomcat.name should be ("tomcat")
-      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
       tomcat.host.toString.startsWith("my.test.host") should be (true)
     }
   }
@@ -233,8 +233,8 @@ class DslTest extends FlatSpec with Matchers {
     val hosts = "my.test.host" ~ (1 to 10)
 
     val tomcats = "tomcat" on hosts ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     tomcats.procs.size should be (10)
@@ -243,8 +243,8 @@ class DslTest extends FlatSpec with Matchers {
 
     tomcats.procs.foreach { tomcat =>
       tomcat.name should be ("tomcat")
-      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
       tomcat.host.toString.startsWith("my.test.host") should be (true)
     }
   }
@@ -253,8 +253,8 @@ class DslTest extends FlatSpec with Matchers {
     val hosts = "my.test.host" ~ ((1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 
     val tomcats = "tomcat" on hosts ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     tomcats.procs.size should be (10)
@@ -263,16 +263,16 @@ class DslTest extends FlatSpec with Matchers {
 
     tomcats.procs.foreach { tomcat =>
       tomcat.name should be ("tomcat")
-      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", "start"))
-      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", "stop"))
+      tomcat.startCmd should be (Exec("/etc/init.d/tomcat", List("start")))
+      tomcat.stopCmd should be (Exec("/etc/init.d/tomcat", List("stop")))
       tomcat.host.toString.startsWith("my.test.host") should be (true)
     }
   }
 
   it should "allow to define tasks with processes" in {
     val tomcat: Process = "tomcat" on Localhost ~> {
-      case Start => Exec("/etc/init.d/tomcat", "start")
-      case Stop => Exec("/etc/init.d/tomcat", "stop")
+      case Start => Exec("/etc/init.d/tomcat", List("start"))
+      case Stop => Exec("/etc/init.d/tomcat", List("stop"))
     }
 
     val startTomcat = tomcat ! Start
@@ -287,8 +287,8 @@ class DslTest extends FlatSpec with Matchers {
     val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
-      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
+      case Start => Exec(procStart, List(getClass.getResource("/program-start.sh").getPath))
+      case Stop => Exec(procStop, List(getClass.getResource("/program-stop.sh").getPath))
     }
 
     val startShell = program ! Start
@@ -309,8 +309,8 @@ class DslTest extends FlatSpec with Matchers {
     val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
-      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
+      case Start => Exec(procStart, List(getClass.getResource("/program-start.sh").getPath))
+      case Stop => Exec(procStop, List(getClass.getResource("/program-stop.sh").getPath))
     }
 
     val startShell = program ! Start
@@ -328,8 +328,8 @@ class DslTest extends FlatSpec with Matchers {
     val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
-      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
+      case Start => Exec(procStart, List(getClass.getResource("/program-start.sh").getPath))
+      case Stop => Exec(procStop, List(getClass.getResource("/program-stop.sh").getPath))
     }
 
     val startShell = program ! Start
@@ -351,8 +351,8 @@ class DslTest extends FlatSpec with Matchers {
     val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
-      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
+      case Start => Exec(procStart, List(getClass.getResource("/program-start.sh").getPath))
+      case Stop => Exec(procStop, List(getClass.getResource("/program-stop.sh").getPath))
     }
 
     val startShell = program ! Start
@@ -372,8 +372,8 @@ class DslTest extends FlatSpec with Matchers {
     val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
-      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
+      case Start => Exec(procStart, List(getClass.getResource("/program-start.sh").getPath))
+      case Stop => Exec(procStop, List(getClass.getResource("/program-stop.sh").getPath))
     }
 
     val startShellFailure = FailedTask(List(), List("task error"))
@@ -393,19 +393,19 @@ class DslTest extends FlatSpec with Matchers {
     val procStart = "/bin/sh"
 
     val program1: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "1")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "1"))
     }
 
     val program2: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "2")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "2"))
     }
 
     val program3: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "3")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "3"))
     }
 
     val program4: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "4")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "4"))
     }
 
     val processes: Processes = Processes(List(program1, program2, program3, program4))
@@ -424,19 +424,19 @@ class DslTest extends FlatSpec with Matchers {
     val procStart = "/bin/sh"
 
     val program1: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "1")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "1"))
     }
 
     val program2: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "2")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "2"))
     }
 
     val program3: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "3")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "3"))
     }
 
     val program4: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "4")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "4"))
     }
 
     val processes: Processes = Processes(List(program1, program2, program3, program4))
@@ -456,19 +456,19 @@ class DslTest extends FlatSpec with Matchers {
     val procStart = "/bin/sh"
 
     val program1: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "1")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "1"))
     }
 
     val program2: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "2")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "2"))
     }
 
     val program3: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "3")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "3"))
     }
 
     val program4: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "4")
+      case Start => Exec(procStart, List(getClass.getResource("/program-param.sh").getPath, "4"))
     }
 
     val task1 = new TaskM[Boolean] {

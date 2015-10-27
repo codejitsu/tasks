@@ -183,7 +183,7 @@ object Tasks {
       def ~[T <: UsingSudo[T] with UsingParallelExecution[T]](task: T): T = task.sudo.par
     }
 
-    def ~ (exec: Exec): SudoExec = SudoExec(exec.path, exec.params :_*)
+    def ~ (exec: Exec): SudoExec = SudoExec(exec.path, exec.params)
     def ~[T <: UsingSudo[T]](task: T): T = task.sudo
     def ~ (p: Par.type): ParHandler = ParHandler()
   }
