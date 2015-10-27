@@ -158,7 +158,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     case _ => ""
   }
 
-  private def printCommandLog(msg: String, color: String, statusMsg: String, commandLine: List[String],
+  private def printCommandLog(msg: String, color: String, statusMsg: String, commandLine: Seq[String],
                               verbose: VerbosityLevel): Unit = verbose match {
     case Verbose | FullOutput =>
       println(s"$msg [$color $statusMsg ${Console.RESET}]")
@@ -181,6 +181,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     val result = cmd match {
       case SudoExec(_, _*) =>
+        //TODO convert all to Seq
         (s"/bin/echo '${user.localPassword().mkString}' | ${cmd.cmd}" run (ProcessLogger(doOut(out, verbose)(_),
           doOut(err, verbose)(_)))).exitValue()
 
@@ -191,8 +192,9 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
         val (args: Array[String], file: Option[String]) = extractFileFromArgs(cmd)
 
         val command  = OS.getCurrentOs() match {
+          //TODO convert all to Seq
           case Linux => file match {
-              case None => Seq("/bin/echo", "-e", inputStr) #| (Seq("/usr/bin/xargs", cmd.path) ++ args)
+              case None => Seq("/bin/echo", "-e", "'" + inputStr + "'") #| (Seq("/usr/bin/xargs", cmd.path) ++ args)
               case Some(f) => Seq("/bin/echo", inputStr) #| (Seq("/usr/bin/xargs", "-d", "\\n", cmd.path) ++ args) #> new File(f)
             }
 
@@ -248,18 +250,19 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     }
   }.getOrElse("")
 
-  private def buildSshCommandFor(remoteHost: Host, cmd: CommandLine, sshu: User with SshCredentials) = {
-    val noHostKeyChecking = "-o" :: "UserKnownHostsFile=/dev/null" :: "-o" :: "StrictHostKeyChecking=no" :: Nil
+  private def buildSshCommandFor(remoteHost: Host, cmd: CommandLine, sshu: User with SshCredentials): Seq[String] = {
+    val noHostKeyChecking = Seq("-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no")
     val keyFileArgs = sshu.keyFile.toList.flatMap("-i" :: _.getPath :: Nil)
 
+    //FIXME convert all to Seq
     cmd match {
       case SudoExec(_, _*) =>
-        "ssh" :: "-qtt" :: noHostKeyChecking ::: keyFileArgs ::: s"${sshu.username}@${remoteHost.toString()}" ::
-          s"echo '${sshu.password().mkString}' | ${cmd.cmd}" :: Nil
+        Seq("ssh", "-qtt") ++ noHostKeyChecking //::: keyFileArgs ::: s"${sshu.username}@${remoteHost.toString()}" ::
+          //s"echo '${sshu.password().mkString}' | ${cmd.cmd}" :: Nil
 
       case Exec(_, _*) =>
-        "ssh" :: "-qtt" :: noHostKeyChecking ::: keyFileArgs ::: s"${sshu.username}@${remoteHost.toString()}" ::
-          cmd.cmd :: Nil
+        Seq("ssh", "-qtt") ++ noHostKeyChecking //::: keyFileArgs ::: s"${sshu.username}@${remoteHost.toString()}" ::
+          //cmd.cmd :: Nil
 
       case NoExec => Nil
     }
@@ -271,7 +274,7 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     val msg = mkCommandLog(cmd, verbose, input)
 
-    def remoteCommandLine(user: User): List[String] = try {
+    def remoteCommandLine(user: User): Seq[String] = try {
       user match {
         case sshu: SshUser => buildSshCommandFor(remoteHost, cmd, sshu)
         case sshu: SshUserWithPassword => buildSshCommandFor(remoteHost, cmd, sshu)

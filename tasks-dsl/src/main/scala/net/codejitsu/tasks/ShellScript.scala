@@ -10,7 +10,7 @@ import net.codejitsu.tasks.dsl._
 final case class ShellScript[S <: Stage](hosts: Hosts, script: String, params: List[String] = List.empty[String],
                                          usingSudo: Boolean = false, usingPar: Boolean = false,
                                          shell: String = "/bin/sh")(implicit user: User, stage: S, rights: S Allow StartService[S])
-  extends GenericTask("script", "run shell script", hosts, s"$shell $script", params,
+  extends GenericTask("script", "run shell script", hosts, s"$shell", (Seq(script) ++ params.toSeq).toList,
     usingSudo, usingPar, taskRepr = s"run shell script '$script'") with UsingSudo[ShellScript[S]] with UsingParallelExecution[ShellScript[S]] {
 
   override def sudo: ShellScript[S] = copy[S](usingSudo = true)

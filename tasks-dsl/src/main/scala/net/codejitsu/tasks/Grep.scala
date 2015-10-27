@@ -17,7 +17,7 @@ final case class Grep[S <: Stage](hosts: Hosts,
                                  target: Option[String] = None,
                                  usingSudo: Boolean = false,
                                  usingPar: Boolean = false,
-                                 exec: String = "/usr/bin/grep",
+                                 exec: String = Grep.getExec(),
                                  params: List[String] = Nil,
                                  pattern: Option[String] = None)(implicit user: User, stage: S, rights: S Allow Grep[S])
   extends GenericTask("grep", "searches any given input files, selecting lines that match one or more patterns", hosts, exec,
@@ -34,5 +34,11 @@ object Grep {
     val tar = target.fold("")(t => t)
 
     params ++ List(pat, tar)
+  }
+
+  def getExec(): String = OS.getCurrentOs() match {
+    case Linux => "/bin/grep"
+    case MacOS => "/usr/bin/grep"
+    case _ => throw new IllegalArgumentException("Not supported OS")
   }
 }

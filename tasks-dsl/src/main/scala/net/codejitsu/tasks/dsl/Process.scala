@@ -17,7 +17,7 @@ case object Stop extends Command {
 sealed trait CommandLine {
   def path: String
   def args: Array[String]
-  def cmd: String = s"$path ${args.mkString(" ")}"
+  def cmd: Seq[String] = Seq(path) ++ args.toSeq
   def shortPath: String = path.split("/").last
 }
 
@@ -27,7 +27,7 @@ final case class Exec(path: String, params: String*) extends CommandLine {
 
 final case class SudoExec(path: String, params: String*) extends CommandLine {
   def args: Array[String] = params.toArray
-  override def cmd: String = s"sudo -S ${super.cmd}"
+  override def cmd: Seq[String] = Seq("sudo", "-S") ++ super.cmd
 }
 
 case object NoExec extends CommandLine {

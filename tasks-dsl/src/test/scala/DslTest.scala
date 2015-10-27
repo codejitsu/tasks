@@ -283,12 +283,12 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "run processes on localhost" in {
-    val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
-    val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
+    val procStart = "/bin/sh"
+    val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart)
-      case Stop => Exec(procStop)
+      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
+      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
     }
 
     val startShell = program ! Start
@@ -305,12 +305,12 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on localhost" in {
-    val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
-    val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
+    val procStart = "/bin/sh"
+    val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart)
-      case Stop => Exec(procStop)
+      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
+      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
     }
 
     val startShell = program ! Start
@@ -324,12 +324,12 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on monadic way" in {
-    val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
-    val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
+    val procStart = "/bin/sh"
+    val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart)
-      case Stop => Exec(procStop)
+      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
+      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
     }
 
     val startShell = program ! Start
@@ -347,12 +347,12 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on monadic way (one task)" in {
-    val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
-    val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
+    val procStart = "/bin/sh"
+    val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart)
-      case Stop => Exec(procStop)
+      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
+      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
     }
 
     val startShell = program ! Start
@@ -368,12 +368,12 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "compose processes on monadic way (failure)" in {
-    val procStart = "sh " + getClass.getResource("/program-start.sh").getPath
-    val procStop = "sh " + getClass.getResource("/program-stop.sh").getPath
+    val procStart = "/bin/sh"
+    val procStop = "/bin/sh"
 
     val program: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart)
-      case Stop => Exec(procStop)
+      case Start => Exec(procStart, getClass.getResource("/program-start.sh").getPath)
+      case Stop => Exec(procStop, getClass.getResource("/program-stop.sh").getPath)
     }
 
     val startShellFailure = FailedTask(List(), List("task error"))
@@ -390,22 +390,22 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "run processes sequentially" in {
-    val procStart = "sh " + getClass.getResource("/program-param.sh").getPath
+    val procStart = "/bin/sh"
 
     val program1: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "1")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "1")
     }
 
     val program2: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "2")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "2")
     }
 
     val program3: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "3")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "3")
     }
 
     val program4: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "4")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "4")
     }
 
     val processes: Processes = Processes(List(program1, program2, program3, program4))
@@ -421,22 +421,22 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "run processes parallel" in {
-    val procStart = "sh " + getClass.getResource("/program-param.sh").getPath
+    val procStart = "/bin/sh"
 
     val program1: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "1")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "1")
     }
 
     val program2: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "2")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "2")
     }
 
     val program3: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "3")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "3")
     }
 
     val program4: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "4")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "4")
     }
 
     val processes: Processes = Processes(List(program1, program2, program3, program4))
@@ -453,22 +453,22 @@ class DslTest extends FlatSpec with Matchers {
   }
 
   it should "preserve the execution order" in {
-    val procStart = "sh " + getClass.getResource("/program-param.sh").getPath
+    val procStart = "/bin/sh"
 
     val program1: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "1")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "1")
     }
 
     val program2: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "2")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "2")
     }
 
     val program3: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "3")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "3")
     }
 
     val program4: Process = "test" on Localhost ~> {
-      case Start => Exec(procStart, "4")
+      case Start => Exec(procStart, getClass.getResource("/program-param.sh").getPath, "4")
     }
 
     val task1 = new TaskM[Boolean] {
