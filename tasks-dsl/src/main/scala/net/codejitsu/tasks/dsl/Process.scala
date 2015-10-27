@@ -19,6 +19,39 @@ sealed trait CommandLine {
   def args: Array[String]
   def cmd: Seq[String] = Seq(path) ++ args.toSeq
   def shortPath: String = path.split("/").last
+  def pipeCmd: Seq[String] = {
+    val (args: Array[String], file: Option[String]) = this.extractFileFromArgs()
+
+    val command  = OS.getCurrentOs() match {
+      case Linux => file match {
+        case None => Seq("/usr/bin/xargs", this.path) ++ args
+        case Some(f) => Seq("/usr/bin/xargs", "-d", "\\n", this.path) ++ args
+      }
+
+      case MacOS => file match {
+        case None => Seq("/usr/bin/xargs", "-0", this.path) ++ args
+        case Some(f) => Seq("/usr/bin/xargs", "-0", this.path) ++ args
+      }
+
+      case _ => throw new IllegalArgumentException("Not supported OS")
+    }
+
+    command
+  }
+
+  def extractFileFromArgs(): (Array[String], Option[String]) = {
+    val args = this.args.takeWhile(_ != ">")
+    val fileData = this.args.dropWhile(_ != ">")
+
+    val file = if (fileData.isEmpty) {
+      None
+    } else if (fileData.size == 2) {
+      Some(fileData(1))
+    } else {
+      None
+    }
+    (args, file)
+  }
 }
 
 final case class Exec(path: String, params: String*) extends CommandLine {

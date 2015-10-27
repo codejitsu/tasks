@@ -189,18 +189,17 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
         (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
       case Exec(_, _*) if !inputStr.isEmpty =>
-        val (args: Array[String], file: Option[String]) = extractFileFromArgs(cmd)
+        val (args: Array[String], file: Option[String]) = cmd.extractFileFromArgs()
 
         val command  = OS.getCurrentOs() match {
-          //TODO convert all to Seq
           case Linux => file match {
-              case None => Seq("/bin/echo", "-e", "'" + inputStr + "'") #| (Seq("/usr/bin/xargs", cmd.path) ++ args)
-              case Some(f) => Seq("/bin/echo", inputStr) #| (Seq("/usr/bin/xargs", "-d", "\\n", cmd.path) ++ args) #> new File(f)
+              case None => Seq("/bin/echo", "-e", "'" + inputStr + "'") #| cmd.pipeCmd
+              case Some(f) => Seq("/bin/echo", inputStr) #| cmd.pipeCmd #> new File(f)
             }
 
           case MacOS => file match {
-              case None => Seq("/bin/echo", inputStr) #| (Seq("/usr/bin/xargs", "-0", cmd.path) ++ args)
-              case Some(f) => Seq("/bin/echo", "-n", inputStr) #| (Seq("/usr/bin/xargs", "-0", cmd.path) ++ args) #> new File(f)
+              case None => Seq("/bin/echo", inputStr) #| cmd.pipeCmd
+              case Some(f) => Seq("/bin/echo", "-n", inputStr) #| cmd.pipeCmd #> new File(f)
             }
 
           case _ => throw new IllegalArgumentException("Not supported OS")
@@ -226,20 +225,6 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
       TaskResult(Failure[Boolean](new TaskExecutionError(err.toList)), out.toList, err.toList)
     }
-  }
-
-  def extractFileFromArgs(cmd: CommandLine): (Array[String], Option[String]) = {
-    val args = cmd.args.takeWhile(_ != ">")
-    val fileData = cmd.args.dropWhile(_ != ">")
-
-    val file = if (fileData.isEmpty) {
-      None
-    } else if (fileData.size == 2) {
-      Some(fileData(1))
-    } else {
-      None
-    }
-    (args, file)
   }
 
   private def mkInput(input: Option[TaskResult[_]]): String = input.map { res =>
