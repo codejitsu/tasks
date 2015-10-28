@@ -22,7 +22,8 @@ final case class Grep[S <: Stage](hosts: Hosts,
                                  pattern: Option[String] = None)(implicit user: User, stage: S, rights: S Allow Grep[S])
   extends GenericTask("grep", "searches any given input files, selecting lines that match one or more patterns", hosts, exec,
     Grep.makeCommandLine(params, pattern, target),
-    usingSudo, usingPar, taskRepr = s"grep file '${target}' for patterns") with UsingSudo[Grep[S]] with UsingParallelExecution[Grep[S]] {
+    usingSudo, usingPar, taskRepr = s"grep file '${target}' for patterns",
+    pipeCmd = Grep.pipeCmd(pattern)) with UsingSudo[Grep[S]] with UsingParallelExecution[Grep[S]] {
 
   override def sudo: Grep[S] = copy[S](usingSudo = true)
   override def par: Grep[S] = copy[S](usingPar = true)
@@ -41,4 +42,6 @@ object Grep {
     case MacOS => "/usr/bin/grep"
     case _ => throw new IllegalArgumentException("Not supported OS")
   }
+
+  def pipeCmd(pattern: Option[String]): Seq[String] = Seq(getExec(), "-o") ++ pattern.fold(Seq[String]())(p => Seq[String](p))
 }

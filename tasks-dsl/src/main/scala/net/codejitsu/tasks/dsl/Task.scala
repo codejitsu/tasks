@@ -180,20 +180,20 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
     val inputStr = mkInput(input)
 
     val result = cmd match {
-      case SudoExec(_, _) =>
+      case SudoExec(_, _, _) =>
         //TODO convert all to Seq
         (s"/bin/echo '${user.localPassword().mkString}' | ${cmd.cmd}" run (ProcessLogger(doOut(out, verbose)(_),
           doOut(err, verbose)(_)))).exitValue()
 
-      case Exec(_, _) if inputStr.isEmpty =>
+      case Exec(_, _, _) if inputStr.isEmpty =>
         (cmd.cmd run (ProcessLogger(doOut(out, verbose)(_), doOut(err, verbose)(_)))).exitValue()
 
-      case Exec(_, _) if !inputStr.isEmpty =>
+      case Exec(_, _, _) if !inputStr.isEmpty =>
         val (args: Array[String], file: Option[String]) = cmd.extractFileFromArgs()
 
         val command  = OS.getCurrentOs() match {
           case Linux => file match {
-              case None => Seq("/bin/echo", "-e", "'" + inputStr + "'") #| cmd.pipeCmd
+              case None => Seq("/bin/echo", "-e", inputStr) #| cmd.pipeCmd
               case Some(f) => Seq("/bin/echo", inputStr) #| cmd.pipeCmd #> new File(f)
             }
 
@@ -241,11 +241,11 @@ class ShellTask(val ctx: Process, val op: Command)(implicit val user: User) exte
 
     //FIXME convert all to Seq
     cmd match {
-      case SudoExec(_, _) =>
+      case SudoExec(_, _, _) =>
         Seq("ssh", "-qtt") ++ noHostKeyChecking //::: keyFileArgs ::: s"${sshu.username}@${remoteHost.toString()}" ::
           //s"echo '${sshu.password().mkString}' | ${cmd.cmd}" :: Nil
 
-      case Exec(_, _) =>
+      case Exec(_, _, _) =>
         Seq("ssh", "-qtt") ++ noHostKeyChecking //::: keyFileArgs ::: s"${sshu.username}@${remoteHost.toString()}" ::
           //cmd.cmd :: Nil
 

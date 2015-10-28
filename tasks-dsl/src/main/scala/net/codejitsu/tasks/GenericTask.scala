@@ -7,14 +7,15 @@ import net.codejitsu.tasks.dsl.Tasks._
 
 abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: String,
                            params: List[String] = Nil, usingSudo: Boolean = false,
-                           usingPar: Boolean = false, cmd: Command = Start, taskRepr: String = "")(implicit user: User) extends TaskM[Boolean] {
+                           usingPar: Boolean = false, cmd: Command = Start, taskRepr: String = "",
+                           pipeCmd: Seq[String] = Seq[String]())(implicit user: User) extends TaskM[Boolean] {
   override def description: String = desc
 
   protected val procs: Processes = name on hosts ~> {
     case cmd => if (usingSudo) {
-      Sudo ~ Exec(exec, params)
+      Sudo ~ Exec(exec, params, pipeCmd)
     } else {
-      Exec(exec, params)
+      Exec(exec, params, pipeCmd)
     }
   }
 

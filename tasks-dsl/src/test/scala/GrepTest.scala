@@ -1,5 +1,7 @@
 package net.codejitsu.tasks.dsl
 
+import java.net.URL
+
 import org.scalatest.{FlatSpec, Matchers}
 
 class GrepTest extends FlatSpec with Matchers {
@@ -55,18 +57,37 @@ class GrepTest extends FlatSpec with Matchers {
     taskResult.err should be (empty)
     taskResult.out.filter(_.startsWith("<title")).size should be (31)
   }
+
+  it should "support piping" in {
+    val getRawTitles = Grep(Localhost, Option(getClass.getResource("/test-grep.txt").getPath), params = List("-o"),
+      pattern = Option("<title type=\"text\">[^<]*"))
+
+    val getTitles = Grep(Localhost, params = List("-o"), pattern = Option("[^>]*$"))
+
+    val task = getRawTitles pipeTo getTitles
+
+    val taskResult = task.run()
+
+    taskResult.res.isSuccess should be (true)
+    taskResult.err should be (empty)
+    taskResult.out.filter(_.startsWith("<title")).size should be (0)
+  }
+
+//  it should "support complex piping" in {
+//    //TODO add Wget
 //
-//  it should "support piping" in {
-//    val taskOne = Grep(Localhost, Option(getClass.getResource("/test-grep.txt").getPath), params = List("-o"),
-//      pattern = Option("<title type=\"text\">[^<]*"))
+//    val download =
+//      Download(Localhost, new URL("http://stackoverflow.com/feeds/tag?tagnames=scala&sort=newest"), "/")
 //
-//    val taskTwo = Grep(Localhost, params = List("-o"), pattern = Option("[^>]*$"))
+//    val getRawTitles = Grep(Localhost, params = List("-o"), pattern = Option("<title type=\"text\">[^<]*"))
 //
-//    val task = taskOne pipeTo taskTwo
+//    val getTitles = Grep(Localhost, params = List("-o"), pattern = Option("[^>]*$"))
+//
+//    val task =
+//      getRawTitles pipeTo
+//      getTitles
 //
 //    val taskResult = task.run()
-//
-//    println(taskResult)
 //
 //    taskResult.res.isSuccess should be (true)
 //    taskResult.err should be (empty)

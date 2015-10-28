@@ -54,13 +54,15 @@ sealed trait CommandLine {
   }
 }
 
-final case class Exec(path: String, params: List[String] = Nil) extends CommandLine {
+final case class Exec(path: String, params: List[String] = Nil, pipe: Seq[String] = Seq[String]()) extends CommandLine {
   def args: Array[String] = params.toArray
+  override def pipeCmd: Seq[String] = if(pipe.isEmpty) super.pipeCmd else pipe
 }
 
-final case class SudoExec(path: String, params: List[String] = Nil) extends CommandLine {
+final case class SudoExec(path: String, params: List[String] = Nil, pipe: Seq[String] = Seq[String]()) extends CommandLine {
   def args: Array[String] = params.toArray
   override def cmd: Seq[String] = Seq("sudo", "-S") ++ super.cmd
+  override def pipeCmd: Seq[String] = if(pipe.isEmpty) super.pipeCmd else pipe
 }
 
 case object NoExec extends CommandLine {
