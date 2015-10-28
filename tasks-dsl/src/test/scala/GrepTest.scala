@@ -72,25 +72,24 @@ class GrepTest extends FlatSpec with Matchers {
     taskResult.err should be (empty)
     taskResult.out.filter(_.startsWith("<title")).size should be (0)
   }
+/*
+  it should "support complex piping" in {
+    val getRawFeed = GetRequest("http://stackoverflow.com".h, "/feeds/tag?tagnames=scala&sort=newest")
 
-//  it should "support complex piping" in {
-//    //TODO add Wget
-//
-//    val download =
-//      Download(Localhost, new URL("http://stackoverflow.com/feeds/tag?tagnames=scala&sort=newest"), "/")
-//
-//    val getRawTitles = Grep(Localhost, params = List("-o"), pattern = Option("<title type=\"text\">[^<]*"))
-//
-//    val getTitles = Grep(Localhost, params = List("-o"), pattern = Option("[^>]*$"))
-//
-//    val task =
-//      getRawTitles pipeTo
-//      getTitles
-//
-//    val taskResult = task.run()
-//
-//    taskResult.res.isSuccess should be (true)
-//    taskResult.err should be (empty)
-//    taskResult.out.filter(_.startsWith("<title")).size should be (0)
-//  }
+    val getRawTitles = Grep(Localhost, params = List("-o"), pattern = Option("<title type=\"text\">[^<]*"))
+
+    val getTitles = Grep(Localhost, params = List("-o"), pattern = Option("[^>]*$"))
+
+    val task =
+      getRawFeed pipeTo
+      getRawTitles pipeTo
+      getTitles
+
+    val taskResult = task.run()
+
+    taskResult.res.isSuccess should be (true)
+    taskResult.err should be (empty)
+    taskResult.out.filter(_.startsWith("<title")).size should be (0)
+  }
+  */
 }
