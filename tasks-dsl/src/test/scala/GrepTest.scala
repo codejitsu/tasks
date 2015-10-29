@@ -74,7 +74,9 @@ class GrepTest extends FlatSpec with Matchers {
   }
 /*
   it should "support complex piping" in {
-    val getRawFeed = Download(Localhost, new URL("http://stackoverflow.com/feeds/tag?tagnames=scala&sort=newest"), "-")
+    val getRawFeed =
+      Download(Localhost, new URL("http://stackoverflow.com"), "/feeds/tag?tagnames=scala&sort=newest"/*,
+      params = List("-q", "-O-")*/)
 
     val getRawTitles = Grep(Localhost, params = List("-o"), pattern = Option("<title type=\"text\">[^<]*"))
 
@@ -82,12 +84,14 @@ class GrepTest extends FlatSpec with Matchers {
 
     val task =
       getRawFeed //pipeTo
-//      getRawTitles pipeTo
+//      getRawTitles //pipeTo
 //      getTitles
 
     val taskResult = task.run(FullOutput)
 
-    taskResult.out.foreach(println)
+    println(taskResult)
+
+    //taskResult.out.foreach(println)
 
     taskResult.res.isSuccess should be (true)
     taskResult.err should be (empty)
