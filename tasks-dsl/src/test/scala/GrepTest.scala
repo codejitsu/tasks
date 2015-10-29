@@ -86,7 +86,7 @@ class GrepTest extends FlatSpec with Matchers {
       getRawFeed pipeTo
       getRawTitles pipeTo
       getTitles pipeTo
-      Head(Localhost)
+      Head(Localhost, verbose = FullOutput)
 
     val taskResult = task.run(FullOutput)
 

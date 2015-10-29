@@ -2,12 +2,7 @@
 
 package net.codejitsu.tasks
 
-import net.codejitsu.tasks.dsl.Allow
-import net.codejitsu.tasks.dsl.Hosts
-import net.codejitsu.tasks.dsl.Stage
-import net.codejitsu.tasks.dsl.User
-import net.codejitsu.tasks.dsl.UsingParallelExecution
-import net.codejitsu.tasks.dsl.UsingSudo
+import net.codejitsu.tasks.dsl._
 
 /**
  * Head task.
@@ -22,10 +17,11 @@ final case class Head[S <: Stage](hosts: Hosts,
                                  target: Option[String] = None,
                                  usingSudo: Boolean = false,
                                  usingPar: Boolean = false,
-                                 exec: String = "/usr/bin/head")(implicit user: User, stage: S, rights: S Allow Head[S])
+                                 exec: String = "/usr/bin/head",
+                                 verbose: VerbosityLevel = NoOutput)(implicit user: User, stage: S, rights: S Allow Head[S])
   extends GenericTask("head", "the first part of file", hosts, exec, Nil,
     usingSudo, usingPar, taskRepr = s"display file ${Head.getFileDescription(target)}",
-    pipeCmd = Head.pipeCmd()) with UsingSudo[Head[S]] with UsingParallelExecution[Head[S]] {
+    pipeCmd = Head.pipeCmd(), verbose = Option(verbose)) with UsingSudo[Head[S]] with UsingParallelExecution[Head[S]] {
 
   override def sudo: Head[S] = copy[S](usingSudo = true)
   override def par: Head[S] = copy[S](usingPar = true)
