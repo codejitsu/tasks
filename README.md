@@ -8,6 +8,8 @@ Scripts can be executed locally on localhost or remote over ssh (or in memory if
 My `sbt` plugin `sbt-robot` (https://github.com/codejitsu/sbt-robot) uses `tasks` to define and install custom sbt tasks 
 for projects built with `sbt` tool.
 
+[![Build Status](https://travis-ci.org/codejitsu/tasks.svg?branch=master)](https://travis-ci.org/codejitsu/tasks)
+
 Install
 -------
 
