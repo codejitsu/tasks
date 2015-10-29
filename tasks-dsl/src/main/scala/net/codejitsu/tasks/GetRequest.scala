@@ -2,6 +2,8 @@
 
 package net.codejitsu.tasks
 
+import java.net.URL
+
 import net.codejitsu.tasks.dsl._
 import net.codejitsu.tasks.dsl.Tasks._
 
@@ -161,4 +163,10 @@ object GetRequest {
 
   def prepareParams(host: HostLike, path: String, port: Int): List[String] =
     List("--trace", "-", "-X", "GET") ++ List(s"${host.toString()}:$port$path")
+
+  def apply[S <: Stage](url: String, port: Int)(implicit user: User, stage: S, rights: S Allow GetRequest[S]): GetRequest[S] = {
+    val u = new URL(url)
+
+    GetRequest[S](u.getHost.h, u.getPath + "?" + u.getQuery, port = port)
+  }
 }
