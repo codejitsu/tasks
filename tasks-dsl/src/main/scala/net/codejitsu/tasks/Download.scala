@@ -17,12 +17,13 @@ import net.codejitsu.tasks.dsl._
  * @param user user.
  */
 final case class Download[S <: Stage](hosts: Hosts, url: URL,
-                                      destinationPath: String, usingSudo: Boolean = false,
+                                      destinationPath: Option[String] = None, usingSudo: Boolean = false,
                                       usingPar: Boolean = false,
                                       exec: String = Download.getExec(),
-                                      params: List[String] = List("-P"))(implicit user: User, stage: S, rights: S Allow Download[S])
-  extends GenericTask("wget", "download url", hosts, exec, params ++ List(url.toString) ++ List(destinationPath),
-    usingSudo, usingPar, taskRepr = s"download url '${url.toString}'") with UsingSudo[Download[S]] with UsingParallelExecution[Download[S]] {
+                                      params: List[String] = List("-P"),
+                                      verbose: VerbosityLevel = NoOutput)(implicit user: User, stage: S, rights: S Allow Download[S])
+  extends GenericTask("wget", "download url", hosts, exec, params ++ List(url.toString) ++ Download.getDestination(destinationPath),
+    usingSudo, usingPar, taskRepr = s"download url '${url.toString}'", verbose = Option(verbose)) with UsingSudo[Download[S]] with UsingParallelExecution[Download[S]] {
 
   override def sudo: Download[S] = copy[S](usingSudo = true)
   override def par: Download[S] = copy[S](usingPar = true)
@@ -34,4 +35,7 @@ object Download {
     case MacOS => "/usr/local/bin/wget"
     case _ => throw new IllegalArgumentException("Not supported OS")
   }
+
+  def getDestination(destinationPath: Option[String]): List[String] =
+    destinationPath.fold(List.empty[String])(d => List(d))
 }

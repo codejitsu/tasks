@@ -8,7 +8,7 @@ import net.codejitsu.tasks.dsl.Tasks._
 abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: String,
                            params: List[String] = Nil, usingSudo: Boolean = false,
                            usingPar: Boolean = false, cmd: Command = Start, taskRepr: String = "",
-                           pipeCmd: Seq[String] = Seq[String]())(implicit user: User) extends TaskM[Boolean] {
+                           pipeCmd: Seq[String] = Seq[String](), verbose: Option[VerbosityLevel] = None)(implicit user: User) extends TaskM[Boolean] {
   override def description: String = desc
 
   protected val procs: Processes = name on hosts ~> {
@@ -28,15 +28,15 @@ abstract class GenericTask(name: String, desc: String, hosts: Hosts, exec: Strin
     procs ! cmd
   }
 
-  override def run(verbose: VerbosityLevel = NoOutput, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
+  override def run(verbose: VerbosityLevel, input: Option[TaskResult[_]] = None): TaskResult[Boolean] =
     LoggedRun(
-      verbose,
+      this.verbose.fold(verbose)(v => v),
       usingSudo,
       usingPar,
       hosts,
       taskRepr,
       task,
       input
-    )(verbose)
+    )(this.verbose.fold(verbose)(v => v))
 }
 

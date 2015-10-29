@@ -19,11 +19,12 @@ final case class Grep[S <: Stage](hosts: Hosts,
                                  usingPar: Boolean = false,
                                  exec: String = Grep.getExec(),
                                  params: List[String] = Nil,
-                                 pattern: Option[String] = None)(implicit user: User, stage: S, rights: S Allow Grep[S])
+                                 pattern: Option[String] = None,
+                                 verbose: VerbosityLevel = NoOutput)(implicit user: User, stage: S, rights: S Allow Grep[S])
   extends GenericTask("grep", "searches any given input files, selecting lines that match one or more patterns", hosts, exec,
     Grep.makeCommandLine(params, pattern, target),
-    usingSudo, usingPar, taskRepr = s"grep file '${target}' for patterns",
-    pipeCmd = Grep.pipeCmd(pattern)) with UsingSudo[Grep[S]] with UsingParallelExecution[Grep[S]] {
+    usingSudo, usingPar, taskRepr = s"grep file ${Grep.getFileDescription(target)} for patterns",
+    pipeCmd = Grep.pipeCmd(pattern), verbose = Option(verbose)) with UsingSudo[Grep[S]] with UsingParallelExecution[Grep[S]] {
 
   override def sudo: Grep[S] = copy[S](usingSudo = true)
   override def par: Grep[S] = copy[S](usingPar = true)
@@ -44,4 +45,7 @@ object Grep {
   }
 
   def pipeCmd(pattern: Option[String]): Seq[String] = Seq(getExec(), "-o") ++ pattern.fold(Seq[String]())(p => Seq[String](p))
+
+  def getFileDescription(target: Option[String]): String =
+    target.fold("")(f => s"'$f'")
 }
