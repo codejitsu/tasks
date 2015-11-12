@@ -18,7 +18,7 @@ import net.codejitsu.tasks.dsl._
 class Cp[S <: Stage](hosts: Hosts, source: String, destination: String,
          params: List[String] = Nil, usingSudo: Boolean = false,
          usingPar: Boolean = false, exec: String = "/bin/cp")(implicit user: User, stage: S, rights: S Allow Cp[S])
-  extends GenericTask("rsync", "copy file(s)", hosts, exec, params ::: List(source, destination),
+  extends GenericTask("cp", "copy file(s)", hosts, exec, params ::: List(source, destination),
     usingSudo, usingPar, taskRepr = s"copy file(s) '${source}' -> '${destination}'") with UsingSudo[Cp[S]] with UsingParallelExecution[Cp[S]] {
 
   override def sudo: Cp[S] = Cp[S](hosts, source, destination, params, true, usingPar, exec)
